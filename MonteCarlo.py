@@ -5,39 +5,29 @@ import pandas as pd
 import scipy.stats as stats
 import matplotlib.pyplot as plt
 
-""" paramters:
-S = asset's initial price
-r = asset's historical return
-vol = asset's volatility
-T = time to maturity
-steps = number of time steps
-num = number of simulations
-K = strike price
-rate = risk-free rate
-prem = option premium """
-
 # create a monte carlo simulation
 def monte_carlo_sim(S, r, vol, T, steps, num):
+    """ paramters:
+    S = asset's initial price
+    r = asset's historical return
+    vol = asset's volatility
+    T = time to maturity
+    steps = number of time steps
+    num = number of simulations
+    K = strike price
+    rate = risk-free rate
+    prem = option premium """
     sims = np.zeros((num, 1 + steps))
     sims[:, 0] = S
     dt = T / steps
     nudt = (r - 0.5 * vol **2) *dt
     sidt = vol * np.sqrt(dt)
 
-    for i in range(0, Nrep):
-        for j in range(0, Nsteps):
+    for i in range(num):
+        for j in range(steps):
             sims[i, j+1] = sims[i, j] * np.exp(nudt + sidt * np.random.normal())
     return sims
 
-# setup example testing parameters
-S = 100
-K = 110
-r = 0.03
-vol = 0.25
-T = 0.5
-steps = 10000
-num = 1000
-sims = monte_carlo_sim(S0, r, vol, T, steps, num)
 
 # visualize the monte carlo simulation
 def visualize(sims):
@@ -47,11 +37,9 @@ def visualize(sims):
     plt.xlabel("number of time steps")
     plt.ylabel("stock price")
     plt.title("monte carlo simulation for stock price")
-    plt.show
+    plt.show()
 
-# visualize(sims)
 
-# calculate call value
 def calc_opt_price(S, r, vol, T, steps, num, K, rate):
     dt = T / steps
     nudt = (rate - 0.5 * vol **2) *dt
@@ -79,17 +67,6 @@ def calc_opt_price(S, r, vol, T, steps, num, K, rate):
 
     return C0, SE
 
-# setup example testing parameters for call option
-S = 101.15
-K = 98.01
-r = 0.01
-vol = 0.0991
-T = 0.5
-steps = 1000
-num = 10
-rate = 0.01
-prem = 3.86
-# calc_opt_price(S, r, vol, T, steps, num, K, rate)
 
 def visualize_convergence(C0, SE, prem):
     x1 = np.linspace(C0-3*SE, C0-1*SE, 100)
@@ -114,9 +91,23 @@ def visualize_convergence(C0, SE, prem):
     plt.legend()
     plt.show()
 
-# setup example testing parameters for call option
-C0 = 3.955686199025182
-SE = 0.15199116854795436
-prem = 3.86
 
-# visualize_convergence(C0, SE, prem)
+def run_monte_carlo_example():
+    # Initial parameters
+    S = 100  # Starting stock price
+    K = 110  # Strike price
+    r = 0.03  # Risk-free rate
+    vol = 0.25  # Volatility
+    T = 0.5  # Time to maturity
+    steps = 1000  # Reduced from 10000 for faster execution
+    num = 100  # Reduced from 1000 for faster execution
+    
+    # Run simulation
+    sims = monte_carlo_sim(S, r, vol, T, steps, num)
+    visualize(sims)
+    
+    # Calculate option price
+    C0, SE = calc_opt_price(S, r, vol, T, steps, num, K, r)
+    
+    # Visualize convergence
+    visualize_convergence(C0, SE, C0)  # Using C0 as premium for example
