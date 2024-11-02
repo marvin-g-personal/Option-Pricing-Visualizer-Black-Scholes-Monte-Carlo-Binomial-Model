@@ -122,6 +122,7 @@ class BlackScholes:
 
 # Function to generate heatmaps
 def plot_heatmap(bs_model, spot_range, vol_range, strike, purchase_price_call, purchase_price_put):
+    # Calculate PnL matrices
     call_pnl = np.zeros((len(vol_range), len(spot_range)))
     put_pnl = np.zeros((len(vol_range), len(spot_range)))
     
@@ -152,22 +153,83 @@ def plot_heatmap(bs_model, spot_range, vol_range, strike, purchase_price_call, p
             )
             _, put_price = bs_temp_put.calculate_prices()
             put_pnl[i, j] = put_price - purchase_price_put
+
+    # Create figures with dark background - increased figure size further
+    plt.style.use('dark_background')
+    fig_call, ax_call = plt.subplots(figsize=(15, 12))  # Increased from (12, 10)
+    fig_put, ax_put = plt.subplots(figsize=(15, 12))    # Increased from (12, 10)
+
+    # Custom colormap
+    custom_cmap = sns.diverging_palette(10, 133, as_cmap=True)
+
+    # Calculate vmin and vmax for consistent color scaling
+    vmin = min(call_pnl.min(), put_pnl.min())
+    vmax = max(call_pnl.max(), put_pnl.max())
     
-    # Update heatmap coloring to use RdYlGn for PnL (red for negative, green for positive)
-    fig_call, ax_call = plt.subplots(figsize=(10, 8))
-    sns.heatmap(call_pnl, xticklabels=np.round(spot_range, 2), yticklabels=np.round(vol_range, 2), 
-                annot=True, fmt=".2f", cmap="RdYlGn", center=0, ax=ax_call)
-    ax_call.set_title('CALL Option PnL')
-    ax_call.set_xlabel('Spot Price')
-    ax_call.set_ylabel('Volatility')
-    
-    fig_put, ax_put = plt.subplots(figsize=(10, 8))
-    sns.heatmap(put_pnl, xticklabels=np.round(spot_range, 2), yticklabels=np.round(vol_range, 2), 
-                annot=True, fmt=".2f", cmap="RdYlGn", center=0, ax=ax_put)
-    ax_put.set_title('PUT Option PnL')
-    ax_put.set_xlabel('Spot Price')
-    ax_put.set_ylabel('Volatility')
-    
+    # Adjust the scale to be symmetric around zero but smaller
+    abs_max = max(abs(vmin), abs(vmax))
+    scale_factor = 0.5
+    vmin, vmax = -abs_max * scale_factor, abs_max * scale_factor
+
+    # Plot CALL heatmap with enhanced styling and reduced margins
+    sns.heatmap(
+        call_pnl,
+        ax=ax_call,
+        cmap=custom_cmap,
+        center=0,
+        annot=True,
+        fmt='.1f',
+        cbar_kws={
+            'label': 'PnL ($)',
+            'orientation': 'horizontal',
+            'pad': 0.1,        # Reduced padding
+            'aspect': 50,      # Made colorbar thinner
+            'shrink': 0.8      # Made colorbar shorter
+        },
+        xticklabels=[f'{x:.1f}' for x in spot_range],
+        yticklabels=[f'{x:.2f}' for x in vol_range],
+        annot_kws={'size': 12},  # Increased annotation size
+        square=True,
+        vmin=vmin,
+        vmax=vmax
+    )
+
+    # Plot PUT heatmap with enhanced styling and reduced margins
+    sns.heatmap(
+        put_pnl,
+        ax=ax_put,
+        cmap=custom_cmap,
+        center=0,
+        annot=True,
+        fmt='.1f',
+        cbar_kws={
+            'label': 'PnL ($)',
+            'orientation': 'horizontal',
+            'pad': 0.1,        # Reduced padding
+            'aspect': 50,      # Made colorbar thinner
+            'shrink': 0.8      # Made colorbar shorter
+        },
+        xticklabels=[f'{x:.1f}' for x in spot_range],
+        yticklabels=[f'{x:.2f}' for x in vol_range],
+        annot_kws={'size': 12},  # Increased annotation size
+        square=True,
+        vmin=vmin,
+        vmax=vmax
+    )
+
+    # Customize plots with reduced padding
+    for ax, title in [(ax_call, 'CALL Option PnL'), (ax_put, 'PUT Option PnL')]:
+        ax.set_title(title, fontsize=20, pad=10, color='white', fontweight='bold')
+        ax.set_xlabel('Spot Price ($)', fontsize=14, color='white', labelpad=5)
+        ax.set_ylabel('Volatility', fontsize=14, color='white', labelpad=5)
+        plt.setp(ax.get_xticklabels(), rotation=45, ha='right', color='white', fontsize=12)
+        plt.setp(ax.get_yticklabels(), rotation=0, color='white', fontsize=12)
+
+    # Adjust layouts with minimal padding
+    for fig in [fig_call, fig_put]:
+        fig.patch.set_facecolor('#1E1E1E')
+        fig.tight_layout(pad=1.0)  # Reduced padding
+
     return fig_call, fig_put
 
 # Sidebar for User Inputs
