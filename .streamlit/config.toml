@@ -1,12 +1,12 @@
 [theme]
 # Main colors
-primaryColor = "#00ff88"        # Bright green for buttons and interactive elements
-backgroundColor = "#0e1117"     # Dark background
-secondaryBackgroundColor = "#262730"  # Slightly lighter for cards/sections
-textColor = "#ffffff"          # White text
+primaryColor = "#FF6B4A"        # Vibrant orange for buttons and interactive elements
+backgroundColor = "#1E2A3A"     # Navy blue background
+secondaryBackgroundColor = "#2D3B4E"  # Lighter navy for cards/sections
+textColor = "#E6E6E6"          # Light gray text
 
 # Extra customization
-font = "sans serif"
+font = "monospace"
 
 [server]
 enableStaticServing = true
