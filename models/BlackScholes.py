@@ -1,7 +1,6 @@
 from numpy import exp, sqrt, log
 from scipy.stats import norm
 
-
 class BlackScholes:
     def __init__(
         self,

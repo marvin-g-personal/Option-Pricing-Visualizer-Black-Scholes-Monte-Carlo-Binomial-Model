@@ -69,39 +69,41 @@ class BlackScholes:
         current_price: float,
         volatility: float,
         interest_rate: float,
+        purchase_price: float,
+        option_type: str
     ):
         self.time_to_maturity = time_to_maturity
         self.strike = strike
         self.current_price = current_price
         self.volatility = volatility
         self.interest_rate = interest_rate
+        self.purchase_price = purchase_price
+        self.option_type = option_type
 
-    def calculate_prices(
-        self,
-    ):
-        time_to_maturity = self.time_to_maturity
-        strike = self.strike
-        current_price = self.current_price
-        volatility = self.volatility
-        interest_rate = self.interest_rate
-
+    def calculate_prices(self):
         d1 = (
-            log(current_price / strike) +
-            (interest_rate + 0.5 * volatility ** 2) * time_to_maturity
-            ) / (
-                volatility * sqrt(time_to_maturity)
-            )
-        d2 = d1 - volatility * sqrt(time_to_maturity)
+            log(self.current_price / self.strike) +
+            (self.interest_rate + 0.5 * self.volatility ** 2) * self.time_to_maturity
+        ) / (
+            self.volatility * sqrt(self.time_to_maturity)
+        )
+        d2 = d1 - self.volatility * sqrt(self.time_to_maturity)
 
-        call_price = current_price * norm.cdf(d1) - (
-            strike * exp(-(interest_rate * time_to_maturity)) * norm.cdf(d2)
+        call_price = self.current_price * norm.cdf(d1) - (
+            self.strike * exp(-(self.interest_rate * self.time_to_maturity)) * norm.cdf(d2)
         )
         put_price = (
-            strike * exp(-(interest_rate * time_to_maturity)) * norm.cdf(-d2)
-        ) - current_price * norm.cdf(-d1)
+            self.strike * exp(-(self.interest_rate * self.time_to_maturity)) * norm.cdf(-d2)
+        ) - self.current_price * norm.cdf(-d1)
 
         self.call_price = call_price
         self.put_price = put_price
+
+        # Calculate PnL
+        if self.option_type == 'call':
+            self.pnl = call_price - self.purchase_price
+        else:
+            self.pnl = put_price - self.purchase_price
 
         # GREEKS
         # Delta
@@ -110,7 +112,7 @@ class BlackScholes:
 
         # Gamma
         self.call_gamma = norm.pdf(d1) / (
-            strike * volatility * sqrt(time_to_maturity)
+            self.strike * self.volatility * sqrt(self.time_to_maturity)
         )
         self.put_gamma = self.call_gamma
 
@@ -132,6 +134,10 @@ with st.sidebar:
     time_to_maturity = st.number_input("Time to Maturity (Years)", value=1.0)
     volatility = st.number_input("Volatility (σ)", value=0.2)
     interest_rate = st.number_input("Risk-Free Interest Rate", value=0.05)
+    
+    # New inputs for purchase price and option type
+    purchase_price_call = st.number_input("Call Option Purchase Price", value=0.0)
+    purchase_price_put = st.number_input("Put Option Purchase Price", value=0.0)
 
     st.markdown("---")
     calculate_btn = st.button('Heatmap Parameters')
@@ -145,9 +151,9 @@ with st.sidebar:
 
 
 
-def plot_heatmap(bs_model, spot_range, vol_range, strike):
-    call_prices = np.zeros((len(vol_range), len(spot_range)))
-    put_prices = np.zeros((len(vol_range), len(spot_range)))
+def plot_heatmap(bs_model, spot_range, vol_range, strike, purchase_price_call, purchase_price_put):
+    call_pnl = np.zeros((len(vol_range), len(spot_range)))
+    put_pnl = np.zeros((len(vol_range), len(spot_range)))
     
     for i, vol in enumerate(vol_range):
         for j, spot in enumerate(spot_range):
@@ -156,26 +162,34 @@ def plot_heatmap(bs_model, spot_range, vol_range, strike):
                 strike=strike,
                 current_price=spot,
                 volatility=vol,
-                interest_rate=bs_model.interest_rate
+                interest_rate=bs_model.interest_rate,
+                purchase_price=purchase_price_call,
+                option_type='call'
             )
-            bs_temp.calculate_prices()
-            call_prices[i, j] = bs_temp.call_price
-            put_prices[i, j] = bs_temp.put_price
+            call_price, _ = bs_temp.calculate_prices()
+            call_pnl[i, j] = call_price - purchase_price_call
+
+            bs_temp.purchase_price = purchase_price_put
+            bs_temp.option_type = 'put'
+            _, put_price = bs_temp.calculate_prices()
+            put_pnl[i, j] = put_price - purchase_price_put
     
-    # Plotting Call Price Heatmap
+    # Update heatmap coloring to use RdYlGn for PnL (red for negative, green for positive)
     fig_call, ax_call = plt.subplots(figsize=(10, 8))
-    sns.heatmap(call_prices, xticklabels=np.round(spot_range, 2), yticklabels=np.round(vol_range, 2), annot=True, fmt=".2f", cmap="viridis", ax=ax_call)
-    ax_call.set_title('CALL')
+    sns.heatmap(call_pnl, xticklabels=np.round(spot_range, 2), yticklabels=np.round(vol_range, 2), 
+                annot=True, fmt=".2f", cmap="RdYlGn", center=0, ax=ax_call)
+    ax_call.set_title('CALL Option PnL')
     ax_call.set_xlabel('Spot Price')
     ax_call.set_ylabel('Volatility')
     
-    # Plotting Put Price Heatmap
     fig_put, ax_put = plt.subplots(figsize=(10, 8))
-    sns.heatmap(put_prices, xticklabels=np.round(spot_range, 2), yticklabels=np.round(vol_range, 2), annot=True, fmt=".2f", cmap="viridis", ax=ax_put)
-    ax_put.set_title('PUT')
+    sns.heatmap(put_pnl, xticklabels=np.round(spot_range, 2), yticklabels=np.round(vol_range, 2), 
+                annot=True, fmt=".2f", cmap="RdYlGn", center=0, ax=ax_put)
+    ax_put.set_title('PUT Option PnL')
     ax_put.set_xlabel('Spot Price')
     ax_put.set_ylabel('Volatility')
     
+    return fig_call, fig_put
     return fig_call, fig_put
 
 
@@ -194,7 +208,7 @@ input_df = pd.DataFrame(input_data)
 st.table(input_df)
 
 # Calculate Call and Put values
-bs_model = BlackScholes(time_to_maturity, strike, current_price, volatility, interest_rate)
+bs_model = BlackScholes(time_to_maturity, strike, current_price, volatility, interest_rate, current_price, 'call')
 call_price, put_price = bs_model.calculate_prices()
 
 # Display Call and Put Values in colored tables
