@@ -1,10 +1,11 @@
 [theme]
-primaryColor = "#FF4B4B"
-# backgroundColor = "#10344b"
-backgroundColor = "#0E1117"
-# secondaryBackgroundColor = "#154360"
-secondaryBackgroundColor = "#262730"
-textColor = "#FAFAFA"
+# Main colors
+primaryColor = "#00ff88"        # Bright green for buttons and interactive elements
+backgroundColor = "#0e1117"     # Dark background
+secondaryBackgroundColor = "#262730"  # Slightly lighter for cards/sections
+textColor = "#ffffff"          # White text
+
+# Extra customization
 font = "sans serif"
 
 [server]
