@@ -31,39 +31,57 @@ def monte_carlo_sim(S, r, vol, T, steps, num):
 
 # visualize the monte carlo simulation
 def visualize(sims):
-    plt.figure(figsize = (10,8))
+    fig, ax = plt.subplots(figsize=(10, 8))
     for i in range(len(sims)):
-        plt.plot(sims[i])
-    plt.xlabel("number of time steps")
-    plt.ylabel("stock price")
-    plt.title("monte carlo simulation for stock price")
-    plt.show()
+        ax.plot(sims[i], alpha=0.3)
+    ax.set_xlabel("Number of Time Steps", fontsize=12)
+    ax.set_ylabel("Stock Price ($)", fontsize=12)
+    ax.set_title("Monte Carlo Simulation for Stock Price", fontsize=14)
+    ax.grid(True, alpha=0.5)
+    fig.tight_layout()
+    return fig
 
 
-def calc_opt_price(S, r, vol, T, steps, num, K, rate):
+def calc_opt_price(S, r, vol, T, steps, num, K, option_type='call'):
+    """
+    Parameters:
+        S (float): Initial stock price
+        r (float): Risk-free rate
+        vol (float): Volatility
+        T (float): Time to maturity
+        steps (int): Number of time steps
+        num (int): Number of simulations
+        K (float): Strike price
+        option_type (str): 'call' or 'put'
+    Returns:
+        C0 (float): Option price
+        SE (float): Standard error
+    """
     dt = T / steps
-    nudt = (rate - 0.5 * vol **2) *dt
+    nudt = (r - 0.5 * vol **2) * dt
     sidt = vol * np.sqrt(dt)
     lnS = np.log(S)
 
-    # standard error placeholders
+    # Initialize sums
     sum_CT = 0
     sum_CT2 = 0
 
     for i in range(num):
         lnSt = lnS
         for j in range(steps):
-            lnSt = lnSt + nudt + sidt *np.random.normal()
-
+            lnSt += nudt + sidt * np.random.normal()
         ST = np.exp(lnSt)
-        CT = max(0, ST - K)
-        sum_CT = sum_CT + CT
-        sum_CT2 = sum_CT2 + CT*CT
+        if option_type == 'call':
+            CT = max(0, ST - K)
+        else:
+            CT = max(0, K - ST)
+        sum_CT += CT
+        sum_CT2 += CT**2
 
-    # compute expectation and SE
-    C0 = np.exp(-rate*T)*sum_CT/num
-    sigma = np.sqrt( (sum_CT2 - sum_CT*sum_CT/num)*np.exp(-2*rate*T) / (num -1) )
-    SE = sigma/np.sqrt(num)
+    # Compute expectation and standard error
+    C0 = np.exp(-r*T) * sum_CT / num
+    sigma = np.sqrt((sum_CT2 - (sum_CT**2)/num) * np.exp(-2*r*T) / (num -1))
+    SE = sigma / np.sqrt(num)
 
     return C0, SE
 

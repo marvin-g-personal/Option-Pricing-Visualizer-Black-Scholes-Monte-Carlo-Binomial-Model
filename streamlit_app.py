@@ -6,6 +6,8 @@ import plotly.graph_objects as go
 from numpy import log, sqrt, exp
 import matplotlib.pyplot as plt
 import seaborn as sns
+from models.Binomial import BinomialOptionPricing
+from models.MonteCarlo import monte_carlo_sim, calc_opt_price, visualize, stats
 
 #######################
 # Page configuration
@@ -263,6 +265,22 @@ with st.sidebar:
         
         spot_range = np.linspace(spot_min, spot_max, 10)
         vol_range = np.linspace(vol_min, vol_max, 10)
+    elif model_option == "Monte Carlo":
+        current_price = st.number_input("Initial Stock Price ($)", value=100.0)
+        strike = st.number_input("Strike Price ($)", value=110.0)
+        interest_rate = st.number_input("Risk-Free Rate", value=0.03)
+        volatility = st.number_input("Volatility (σ)", value=0.25)
+        time_to_maturity = st.number_input("Time to Maturity (Years)", value=0.5)
+        steps = st.number_input("Number of Steps", value=1000)
+        num_sims = st.number_input("Number of Simulations", value=100)
+    elif model_option == "Binomial":
+        stock_price = st.number_input("Stock Price ($)", value=80.0)
+        strike_price = st.number_input("Strike Price ($)", value=100.0)
+        expiration_time = st.number_input("Expiration Time (Years)", value=2.0)
+        no_risk_int = st.number_input("Risk-Free Rate", value=0.05)
+        sigma = st.number_input("Volatility (σ)", value=0.3)
+        steps = st.number_input("Number of Steps", value=10)
+        option_type = st.selectbox("Option Type", ("call", "put"))
     else:
         st.markdown("---")
         st.write("### Model not implemented yet.")
@@ -326,3 +344,103 @@ if model_option == "Black-Scholes":
     with col2:
         st.subheader("Put Option PnL Heatmap")
         st.pyplot(heatmap_fig_put)
+
+elif model_option == "Monte Carlo":
+    st.title("Monte Carlo Option Pricing Model")
+    
+    # Run simulation
+    sims = monte_carlo_sim(current_price, interest_rate, volatility, time_to_maturity, steps, num_sims)
+    
+    # Calculate option prices
+    call_price, call_se = calc_opt_price(current_price, interest_rate, volatility, time_to_maturity, 
+                                     steps, num_sims, strike, 'call')
+    put_price, put_se = calc_opt_price(current_price, interest_rate, volatility, time_to_maturity, 
+                                   steps, num_sims, strike, 'put')
+    
+    # Display prices in styled boxes
+    st.markdown(f"""
+        <div class="metric-container">
+            <div class="metric-call">
+                <div>
+                    <div class="metric-label">CALL Value (± {call_se:.3f})</div>
+                    <div class="metric-value">${call_price:.2f}</div>
+                </div>
+            </div>
+            <div class="metric-put">
+                <div>
+                    <div class="metric-label">PUT Value (± {put_se:.3f})</div>
+                    <div class="metric-value">${put_price:.2f}</div>
+                </div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Create two columns for plots
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("Monte Carlo Simulation Paths")
+        fig_sim = visualize(sims)
+        st.pyplot(fig_sim)
+    
+    with col2:
+        st.subheader("Price Convergence Distribution")
+        # Modify visualize_convergence to return figure
+        fig_conv = plt.figure(figsize=(10, 8))
+        x1 = np.linspace(call_price-3*call_se, call_price-call_se, 100)
+        x2 = np.linspace(call_price-call_se, call_price+call_se, 100)
+        x3 = np.linspace(call_price+call_se, call_price+3*call_se, 100)
+        
+        s1 = stats.norm.pdf(x1, call_price, call_se)
+        s2 = stats.norm.pdf(x2, call_price, call_se)
+        s3 = stats.norm.pdf(x3, call_price, call_se)
+        
+        plt.fill_between(x1, s1, color='tab:blue', label='> 1 StDev')
+        plt.fill_between(x2, s2, color='cornflowerblue', label='±1 StDev')
+        plt.fill_between(x3, s3, color='tab:blue')
+        
+        plt.plot([call_price, call_price], [0, max(s2)*1.1], 'k',
+                label='Theoretical Value')
+        
+        plt.ylabel("Probability")
+        plt.xlabel("Option Price ($)")
+        plt.title("Option Price Distribution")
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        st.pyplot(fig_conv)
+
+elif model_option == "Binomial":
+    st.title("Binomial Option Pricing Model")
+    
+    # Create Binomial model instance
+    binomial_model = BinomialOptionPricing(
+        stock_price=stock_price,
+        strike_price=strike_price,
+        expiration_time=expiration_time,
+        no_risk_int=no_risk_int,
+        sigma=sigma,
+        steps=steps,
+        option_type=option_type
+    )
+    
+    # Calculate option price
+    option_price = binomial_model.calculate_option()
+    
+    # Display price in styled box
+    st.markdown(f"""
+        <div class="metric-container">
+            <div class="metric-{option_type}">
+                <div>
+                    <div class="metric-label">{option_type.upper()} Option Price</div>
+                    <div class="metric-value">${option_price:.2f}</div>
+                </div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Display binomial tree
+    st.subheader("Binomial Tree Visualization")
+    fig = plt.figure(figsize=(12, 8))
+    binomial_model.visualize_tree()
+    st.pyplot(fig)
