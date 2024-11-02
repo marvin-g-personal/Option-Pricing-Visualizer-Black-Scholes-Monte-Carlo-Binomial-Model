@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from scipy.stats import norm
 import plotly.graph_objects as go
-from numpy import log, sqrt, exp  # Make sure to import these
+from numpy import log, sqrt, exp
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -13,54 +13,56 @@ st.set_page_config(
     page_title="Black-Scholes Option Pricing Model",
     page_icon="📊",
     layout="wide",
-    initial_sidebar_state="expanded")
-
+    initial_sidebar_state="expanded"
+)
 
 # Custom CSS to inject into Streamlit
 st.markdown("""
 <style>
-/* Adjust the size and alignment of the CALL and PUT value containers */
+/* Center all text in the app */
+h1, h2, h3, h4, h5, h6, p, div {
+    text-align: center;
+}
+
+/* Style the CALL and PUT value boxes */
 .metric-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 8px; /* Adjust the padding to control height */
-    width: auto; /* Auto width for responsiveness, or set a fixed width if necessary */
-    margin: 0 auto; /* Center the container */
+    padding: 20px; /* Increased padding for better visibility */
+    width: 100%;
+    margin: 10px 0; /* Added margin for spacing */
 }
 
-/* Custom classes for CALL and PUT values */
 .metric-call {
-    background-color: #90ee90; /* Light green background */
-    color: black; /* Black font color */
-    margin-right: 10px; /* Spacing between CALL and PUT */
-    border-radius: 10px; /* Rounded corners */
+    background-color: #4CAF50; /* Green background for CALL */
+    color: white; /* White font color */
+    margin-right: 20px; /* Spacing between CALL and PUT */
+    border-radius: 15px; /* More rounded corners */
+    padding: 20px; /* Padding inside the box */
+    width: 45%; /* Width of the box */
 }
 
 .metric-put {
-    background-color: #ffcccb; /* Light red background */
-    color: black; /* Black font color */
-    border-radius: 10px; /* Rounded corners */
+    background-color: #F44336; /* Red background for PUT */
+    color: white; /* White font color */
+    border-radius: 15px; /* More rounded corners */
+    padding: 20px; /* Padding inside the box */
+    width: 45%; /* Width of the box */
 }
 
-/* Style for the value text */
-.metric-value {
-    font-size: 1.5rem; /* Adjust font size */
-    font-weight: bold;
-    margin: 0; /* Remove default margins */
+/* Adjust the sidebar to the right using CSS */
+.sidebar .sidebar-content {
+    order: 2; /* Move sidebar to the right */
 }
 
-/* Style for the label text */
-.metric-label {
-    font-size: 1rem; /* Adjust font size */
-    margin-bottom: 4px; /* Spacing between label and value */
+.main .block-container {
+    order: 1; /* Ensure main content stays on the left */
 }
-
 </style>
 """, unsafe_allow_html=True)
 
-# (Include the BlackScholes class definition here)
-
+# BlackScholes class definition
 class BlackScholes:
     def __init__(
         self,
@@ -114,43 +116,11 @@ class BlackScholes:
         self.call_gamma = norm.pdf(d1) / (
             self.strike * self.volatility * sqrt(self.time_to_maturity)
         )
-        self.put_gamma = self.call_gamma
+        self.put_gamma = self.call_gamma  # Corrected typo
 
         return call_price, put_price
 
 # Function to generate heatmaps
-# ... your existing imports and BlackScholes class definition ...
-
-
-# Sidebar for User Inputs
-with st.sidebar:
-    st.title("📊 Black-Scholes Model")
-    st.write("`Created by:`")
-    linkedin_url = "https://www.linkedin.com/in/mprudhvi/"
-    st.markdown(f'<a href="{linkedin_url}" target="_blank" style="text-decoration: none; color: inherit;"><img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" width="25" height="25" style="vertical-align: middle; margin-right: 10px;">`Prudhvi Reddy, Muppala`</a>', unsafe_allow_html=True)
-
-    current_price = st.number_input("Current Asset Price", value=100.0)
-    strike = st.number_input("Strike Price", value=100.0)
-    time_to_maturity = st.number_input("Time to Maturity (Years)", value=1.0)
-    volatility = st.number_input("Volatility (σ)", value=0.2)
-    interest_rate = st.number_input("Risk-Free Interest Rate", value=0.05)
-    
-    # New inputs for purchase price and option type
-    purchase_price_call = st.number_input("Call Option Purchase Price", value=0.0)
-    purchase_price_put = st.number_input("Put Option Purchase Price", value=0.0)
-
-    st.markdown("---")
-    calculate_btn = st.button('Heatmap Parameters')
-    spot_min = st.number_input('Min Spot Price', min_value=0.01, value=current_price*0.8, step=0.01)
-    spot_max = st.number_input('Max Spot Price', min_value=0.01, value=current_price*1.2, step=0.01)
-    vol_min = st.slider('Min Volatility for Heatmap', min_value=0.01, max_value=1.0, value=volatility*0.5, step=0.01)
-    vol_max = st.slider('Max Volatility for Heatmap', min_value=0.01, max_value=1.0, value=volatility*1.5, step=0.01)
-    
-    spot_range = np.linspace(spot_min, spot_max, 10)
-    vol_range = np.linspace(vol_min, vol_max, 10)
-
-
-
 def plot_heatmap(bs_model, spot_range, vol_range, strike, purchase_price_call, purchase_price_put):
     call_pnl = np.zeros((len(vol_range), len(spot_range)))
     put_pnl = np.zeros((len(vol_range), len(spot_range)))
@@ -200,79 +170,97 @@ def plot_heatmap(bs_model, spot_range, vol_range, strike, purchase_price_call, p
     
     return fig_call, fig_put
 
+# Sidebar for User Inputs
+with st.sidebar:
+    st.title("Options Pricing Visualizer")
+    
+    # Model Selection
+    model_option = st.selectbox(
+        "Select Pricing Model",
+        ("Black-Scholes", "Monte Carlo", "Binomial")
+    )
+    
+    if model_option == "Black-Scholes":
+        current_price = st.number_input("Current Asset Price", value=100.0)
+        strike = st.number_input("Strike Price", value=100.0)
+        time_to_maturity = st.number_input("Time to Maturity (Years)", value=1.0)
+        volatility = st.number_input("Volatility (σ)", value=0.2)
+        interest_rate = st.number_input("Risk-Free Interest Rate", value=0.05)
+        
+        # New inputs for purchase price
+        purchase_price_call = st.number_input("Call Option Purchase Price", value=10.0)
+        purchase_price_put = st.number_input("Put Option Purchase Price", value=8.0)
 
-# Main Page for Output Display
-st.title("Black-Scholes Pricing Model")
+        st.markdown("---")
+        
+        # No Generate Heatmaps button; proceed immediately
+        spot_min = st.number_input('Min Spot Price', min_value=0.01, value=current_price*0.8, step=0.01)
+        spot_max = st.number_input('Max Spot Price', min_value=0.01, value=current_price*1.2, step=0.01)
+        vol_min = st.slider('Min Volatility for Heatmap', min_value=0.01, max_value=1.0, value=volatility*0.5, step=0.01)
+        vol_max = st.slider('Max Volatility for Heatmap', min_value=0.01, max_value=1.0, value=volatility*1.5, step=0.01)
+        
+        spot_range = np.linspace(spot_min, spot_max, 10)
+        vol_range = np.linspace(vol_min, vol_max, 10)
+    else:
+        st.markdown("---")
+        st.write("### Model not implemented yet.")
+        st.stop()
 
-# Table of Inputs
-input_data = {
-    "Current Asset Price": [current_price],
-    "Strike Price": [strike],
-    "Time to Maturity (Years)": [time_to_maturity],
-    "Volatility (σ)": [volatility],
-    "Risk-Free Interest Rate": [interest_rate],
-}
-input_df = pd.DataFrame(input_data)
-st.table(input_df)
+if model_option == "Black-Scholes":
+    # Main Page for Output Display
+    st.title("Black-Scholes Pricing Model")
 
-# Calculate Call and Put values
-bs_model = BlackScholes(
-    time_to_maturity=time_to_maturity,
-    strike=strike,
-    current_price=current_price,
-    volatility=volatility,
-    interest_rate=interest_rate,
-    purchase_price=purchase_price_call,  # Initialize with call purchase price
-    option_type='call'  # Initial type doesn't affect heatmap
-)
-call_price, put_price = bs_model.calculate_prices()
+    # Instantiate BlackScholes class
+    bs_model = BlackScholes(
+        time_to_maturity=time_to_maturity,
+        strike=strike,
+        current_price=current_price,
+        volatility=volatility,
+        interest_rate=interest_rate,
+        purchase_price=purchase_price_call,  # Initialize with call purchase price
+        option_type='call'  # Initial type doesn't affect heatmap
+    )
+    call_price, put_price = bs_model.calculate_prices()
 
-# Display Call and Put Values in colored tables
-col1, col2 = st.columns([1,1], gap="small")
-
-with col1:
-    # Using the custom class for CALL value
+    # Display Call and Put Values in styled boxes
     st.markdown(f"""
-        <div class="metric-container metric-call">
-            <div>
-                <div class="metric-label">CALL Value</div>
-                <div class="metric-value">${call_price:.2f}</div>
+        <div class="metric-container">
+            <div class="metric-call">
+                <div>
+                    <div class="metric-label">CALL Value</div>
+                    <div class="metric-value">${call_price:.2f}</div>
+                </div>
+            </div>
+            <div class="metric-put">
+                <div>
+                    <div class="metric-label">PUT Value</div>
+                    <div class="metric-value">${put_price:.2f}</div>
+                </div>
             </div>
         </div>
     """, unsafe_allow_html=True)
 
-with col2:
-    # Using the custom class for PUT value
-    st.markdown(f"""
-        <div class="metric-container metric-put">
-            <div>
-                <div class="metric-label">PUT Value</div>
-                <div class="metric-value">${put_price:.2f}</div>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown("")
+    st.header("Options P&L - Interactive Heatmap")
+    st.info("Explore how option PnL fluctuates with varying 'Spot Prices' and 'Volatility' levels based on your input parameters.")
 
-st.markdown("")
-st.title("Options P&L - Interactive Heatmap")
-st.info("Explore how option P&L fluctuates with varying 'Spot Prices' and 'Volatility' levels based on your input parameters.")
+    # Generate Heatmaps
+    heatmap_fig_call, heatmap_fig_put = plot_heatmap(
+        bs_model,
+        spot_range,
+        vol_range,
+        strike,
+        purchase_price_call,
+        purchase_price_put
+    )
 
-# Interactive Sliders and Heatmaps for Call and Put Options
-col1, col2 = st.columns([1,1], gap="small")
+    # Display Heatmaps Side by Side
+    col1, col2 = st.columns([1,1], gap="small")
 
-# Call the plot_heatmap function once with all required arguments
-heatmap_fig_call, heatmap_fig_put = plot_heatmap(
-    bs_model,
-    spot_range,
-    vol_range,
-    strike,
-    purchase_price_call,
-    purchase_price_put
-)
+    with col1:
+        st.subheader("Call Option PnL Heatmap")
+        st.pyplot(heatmap_fig_call)
 
-with col1:
-    st.subheader("Call Option P&L Heatmap")
-    st.pyplot(heatmap_fig_call)
-
-with col2:
-    st.subheader("Put Option P&L Heatmap")
-    st.pyplot(heatmap_fig_put)
+    with col2:
+        st.subheader("Put Option PnL Heatmap")
+        st.pyplot(heatmap_fig_put)
