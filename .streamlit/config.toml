@@ -1,9 +1,11 @@
 [theme]
 # Main colors
-primaryColor = "#FF6B4A"        # Vibrant orange for buttons and interactive elements
-backgroundColor = "#1E2A3A"     # Navy blue background
-secondaryBackgroundColor = "#2D3B4E"  # Lighter navy for cards/sections
-textColor = "#E6E6E6"          # Light gray text
+primaryColor = "#4A90E2"  # Soft blue for interactive elements
+backgroundColor = "#0D1B2A"  # Deep navy background for a sleek look
+secondaryBackgroundColor = "#1B263B"  # Dark slate blue for sections
+textColor = "#F0F4F8"  # Very light gray for readability
+accentColor = "#FFB400"  # Warm amber for accents or highlights
+borderColor = "#223B5F"  # Muted blue-gray for subtle borders
 
 # Extra customization
 font = "monospace"
