@@ -12,8 +12,8 @@ from models.MonteCarlo import monte_carlo_sim, calc_opt_price, visualize, stats
 #######################
 # Page configuration
 st.set_page_config(
-    page_title="Black-Scholes Option Pricing Model",
-    page_icon="📊",
+    page_title="Option Pricing Model: Black-Scholes, Monte Carlo & Binomial",
+    page_icon="💰",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -238,13 +238,19 @@ def plot_heatmap(bs_model, spot_range, vol_range, strike, purchase_price_call, p
 #######################
 # Sidebar for User Inputs
 with st.sidebar:
-    st.title("Options Pricing Visualizer")
+    st.title("💰 Options Pricing Visualizer: Black-Scholes, Monte Carlo & Binomial")
+
+    # Add a separator after the model selection
+    st.markdown("---")
     
     # Model Selection
     model_option = st.selectbox(
         "Select Pricing Model",
         ("Black-Scholes", "Monte Carlo", "Binomial")
     )
+    
+    # Add a separator after the model selection
+    st.markdown("---")
     
     if model_option == "Black-Scholes":
         current_price = st.number_input("Current Asset Price", value=100.0)
@@ -269,12 +275,12 @@ with st.sidebar:
         vol_range = np.linspace(vol_min, vol_max, 10)
     elif model_option == "Monte Carlo":
         current_price = st.number_input("Initial Stock Price ($)", value=100.0)
-        strike = st.number_input("Strike Price ($)", value=110.0)
+        strike = st.number_input("Strike Price ($)", value=50.0)
         interest_rate = st.number_input("Risk-Free Rate", value=0.03)
         volatility = st.number_input("Volatility (σ)", value=0.25)
         time_to_maturity = st.number_input("Time to Maturity (Years)", value=0.5)
-        steps = st.number_input("Number of Steps", value=1000)
-        num_sims = st.number_input("Number of Simulations", value=100)
+        steps = st.number_input("Number of Steps", value=100)
+        num_sims = st.number_input("Number of Simulations", value=50)
     elif model_option == "Binomial":
         stock_price = st.number_input("Stock Price ($)", value=80.0)
         strike_price = st.number_input("Strike Price ($)", value=100.0)
@@ -414,7 +420,7 @@ elif model_option == "Monte Carlo":
         st.pyplot(fig_conv)
 
 elif model_option == "Binomial":
-    st.title("Binomial Option Pricing Model")
+    st.title("🌳 Binomial Model")
     
     # Create Binomial model instances for both Call and Put
     binomial_call = BinomialOptionPricing(
