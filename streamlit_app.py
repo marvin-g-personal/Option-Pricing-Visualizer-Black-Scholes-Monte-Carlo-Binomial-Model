@@ -12,15 +12,21 @@ from models.MonteCarlo import monte_carlo_sim, calc_opt_price, visualize, stats
 #######################
 # Page configuration
 st.set_page_config(
-    page_title="Option Pricing Model: Black-Scholes, Monte Carlo & Binomial",
+    page_title="Option Pricing Model",
     page_icon="💰",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS to inject into Streamlit
+# Custom CSS to inject into Streamlit - Updated to move sidebar to right
 st.markdown("""
 <style>
+/* Move sidebar to the right */
+section[data-testid="stSidebar"] {
+    left: unset !important;
+    right: 0 !important;
+}
+
 /* Center all text in the app */
 h1, h2, h3, h4, h5, h6, p, div {
     text-align: center;
@@ -50,15 +56,6 @@ h1, h2, h3, h4, h5, h6, p, div {
     border-radius: 15px;
     padding: 20px;
     width: 45%;
-}
-
-/* Adjust the sidebar to the right using CSS */
-.sidebar .sidebar-content {
-    order: 2;
-}
-
-.main .block-container {
-    order: 1;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -238,7 +235,7 @@ def plot_heatmap(bs_model, spot_range, vol_range, strike, purchase_price_call, p
 #######################
 # Sidebar for User Inputs
 with st.sidebar:
-    st.title("💰 Options Pricing Visualizer: Black-Scholes, Monte Carlo & Binomial")
+    st.title("💰 Options Pricing Visualizer:\n Black-Scholes, Monte Carlo & Binomial")
 
     # Add a separator after the model selection
     st.markdown("---")
@@ -275,12 +272,12 @@ with st.sidebar:
         vol_range = np.linspace(vol_min, vol_max, 10)
     elif model_option == "Monte Carlo":
         current_price = st.number_input("Initial Stock Price ($)", value=100.0)
-        strike = st.number_input("Strike Price ($)", value=50.0)
+        strike = st.number_input("Strike Price ($)", value=100.0)
         interest_rate = st.number_input("Risk-Free Rate", value=0.03)
         volatility = st.number_input("Volatility (σ)", value=0.25)
         time_to_maturity = st.number_input("Time to Maturity (Years)", value=0.5)
-        steps = st.number_input("Number of Steps", value=100)
-        num_sims = st.number_input("Number of Simulations", value=50)
+        steps = st.number_input("Number of Time Steps", value=100)
+        num_sims = st.number_input("Number of Simulations", value=1000)
     elif model_option == "Binomial":
         stock_price = st.number_input("Stock Price ($)", value=80.0)
         strike_price = st.number_input("Strike Price ($)", value=100.0)
@@ -297,7 +294,7 @@ with st.sidebar:
 # Main Content
 if model_option == "Black-Scholes":
     # Main Page for Output Display
-    st.title("Black-Scholes Pricing Model")
+    st.title("🔮 Black-Scholes Model")
 
     # Instantiate BlackScholes class
     bs_model = BlackScholes(
@@ -331,7 +328,7 @@ if model_option == "Black-Scholes":
 
     st.markdown("")
     st.header("Options P&L - Interactive Heatmap")
-    st.info("Explore how option PnL fluctuates with varying 'Spot Prices' and 'Volatility' levels based on your input parameters.")
+    st.info("Explore how option PnL fluctuates with varying 'Spot Prices' and 'Volatility' levels based on given input parameters.")
 
     # Generate Heatmaps
     heatmap_fig_call, heatmap_fig_put = plot_heatmap(
@@ -355,7 +352,7 @@ if model_option == "Black-Scholes":
         st.pyplot(heatmap_fig_put)
 
 elif model_option == "Monte Carlo":
-    st.title("Monte Carlo Option Pricing Model")
+    st.title("🧮 Monte Carlo Model")
     
     # Run simulation
     sims = monte_carlo_sim(current_price, interest_rate, volatility, time_to_maturity, steps, num_sims)
@@ -452,13 +449,13 @@ elif model_option == "Binomial":
         <div class="metric-container">
             <div class="metric-call">
                 <div>
-                    <div class="metric-label">CALL Option Price</div>
+                    <div class="metric-label">CALL Value</div>
                     <div class="metric-value">${call_price:.2f}</div>
                 </div>
             </div>
             <div class="metric-put">
                 <div>
-                    <div class="metric-label">PUT Option Price</div>
+                    <div class="metric-label">PUT Value</div>
                     <div class="metric-value">${put_price:.2f}</div>
                 </div>
             </div>
