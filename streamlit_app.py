@@ -441,6 +441,5 @@ elif model_option == "Binomial":
     
     # Display binomial tree
     st.subheader("Binomial Tree Visualization")
-    fig = plt.figure(figsize=(12, 8))
-    binomial_model.visualize_tree()
-    st.pyplot(fig)
+    fig_tree = binomial_model.visualize_tree()
+    st.pyplot(fig_tree)
