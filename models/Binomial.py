@@ -46,11 +46,14 @@ class BinomialOptionPricing:
         return option_p[0]
 
     def visualize_tree(self):
+        # Set dark style
+        plt.style.use('dark_background')
         fig = plt.figure(figsize=(12, 8))
-        plt.style.use('default')  # Reset to default style
         ax = fig.add_subplot(111)
-        ax.set_facecolor('white')  # Set white background
-        fig.patch.set_facecolor('white')
+        
+        # Set dark background
+        ax.set_facecolor('#1E1E1E')
+        fig.patch.set_facecolor('#1E1E1E')
         
         asset_prices = np.zeros((self.steps + 1, self.steps + 1))
 
@@ -59,17 +62,23 @@ class BinomialOptionPricing:
                 asset_prices[j, i] = self.stock_price * (self.up ** (i - j)) * (self.down ** j)
 
         for i in range(self.steps + 1):
-            plt.plot([i] * (i + 1), asset_prices[:i + 1, i], "o", color='blue', markersize=8)
+            plt.plot([i] * (i + 1), asset_prices[:i + 1, i], "o", 
+                    color='cornflowerblue', markersize=8)
             if i < self.steps:
                 for j in range(i + 1):
                     plt.plot([i, i + 1], [asset_prices[j, i], asset_prices[j, i + 1]], 
-                             color='skyblue', linestyle='-', alpha=0.7, linewidth=2)
+                            color='skyblue', linestyle='-', alpha=0.7, linewidth=2)
                     plt.plot([i, i + 1], [asset_prices[j, i], asset_prices[j + 1, i + 1]], 
-                             color='skyblue', linestyle='-', alpha=0.7, linewidth=2)
+                            color='skyblue', linestyle='-', alpha=0.7, linewidth=2)
 
-        plt.title(f"Binomial Tree for {self.option_type.title()} Option", fontsize=14, pad=20)
-        plt.xlabel("Steps", fontsize=12)
-        plt.ylabel("Price ($)", fontsize=12)
-        plt.grid(True, alpha=0.3)
+        plt.title(f"Binomial Tree for {self.option_type.title()} Option", 
+                 fontsize=14, pad=20, color='white')
+        plt.xlabel("Steps", fontsize=12, color='white')
+        plt.ylabel("Price ($)", fontsize=12, color='white')
+        plt.grid(True, alpha=0.2)  # Reduced grid opacity for dark theme
+        
+        # Make tick labels white
+        plt.tick_params(colors='white')
+        
         plt.tight_layout()
         return fig
