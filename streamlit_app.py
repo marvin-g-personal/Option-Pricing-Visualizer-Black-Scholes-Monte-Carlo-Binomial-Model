@@ -26,44 +26,44 @@ h1, h2, h3, h4, h5, h6, p, div {
     text-align: center;
 }
 
-/* Style the CALL and PUT value boxes */
 .metric-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px; /* Increased padding for better visibility */
+    padding: 20px;
     width: 100%;
-    margin: 10px 0; /* Added margin for spacing */
+    margin: 10px 0;
 }
 
 .metric-call {
-    background-color: #4CAF50; /* Green background for CALL */
-    color: white; /* White font color */
-    margin-right: 20px; /* Spacing between CALL and PUT */
-    border-radius: 15px; /* More rounded corners */
-    padding: 20px; /* Padding inside the box */
-    width: 45%; /* Width of the box */
+    background-color: #4CAF50;
+    color: white;
+    margin-right: 20px;
+    border-radius: 15px;
+    padding: 20px;
+    width: 45%;
 }
 
 .metric-put {
-    background-color: #F44336; /* Red background for PUT */
-    color: white; /* White font color */
-    border-radius: 15px; /* More rounded corners */
-    padding: 20px; /* Padding inside the box */
-    width: 45%; /* Width of the box */
+    background-color: #F44336;
+    color: white;
+    border-radius: 15px;
+    padding: 20px;
+    width: 45%;
 }
 
 /* Adjust the sidebar to the right using CSS */
 .sidebar .sidebar-content {
-    order: 2; /* Move sidebar to the right */
+    order: 2;
 }
 
 .main .block-container {
-    order: 1; /* Ensure main content stays on the left */
+    order: 1;
 }
 </style>
 """, unsafe_allow_html=True)
 
+#######################
 # BlackScholes class definition
 class BlackScholes:
     def __init__(
@@ -122,6 +122,7 @@ class BlackScholes:
 
         return call_price, put_price
 
+#######################
 # Function to generate heatmaps
 def plot_heatmap(bs_model, spot_range, vol_range, strike, purchase_price_call, purchase_price_put):
     # Calculate PnL matrices
@@ -234,6 +235,7 @@ def plot_heatmap(bs_model, spot_range, vol_range, strike, purchase_price_call, p
 
     return fig_call, fig_put
 
+#######################
 # Sidebar for User Inputs
 with st.sidebar:
     st.title("Options Pricing Visualizer")
@@ -280,12 +282,13 @@ with st.sidebar:
         no_risk_int = st.number_input("Risk-Free Rate", value=0.05)
         sigma = st.number_input("Volatility (σ)", value=0.3)
         steps = st.number_input("Number of Steps", value=10)
-        option_type = st.selectbox("Option Type", ("call", "put"))
     else:
         st.markdown("---")
         st.write("### Model not implemented yet.")
         st.stop()
 
+#######################
+# Main Content
 if model_option == "Black-Scholes":
     # Main Page for Output Display
     st.title("Black-Scholes Pricing Model")
@@ -413,33 +416,56 @@ elif model_option == "Monte Carlo":
 elif model_option == "Binomial":
     st.title("Binomial Option Pricing Model")
     
-    # Create Binomial model instance
-    binomial_model = BinomialOptionPricing(
+    # Create Binomial model instances for both Call and Put
+    binomial_call = BinomialOptionPricing(
         stock_price=stock_price,
         strike_price=strike_price,
         expiration_time=expiration_time,
         no_risk_int=no_risk_int,
         sigma=sigma,
         steps=steps,
-        option_type=option_type
+        option_type="call"
     )
     
-    # Calculate option price
-    option_price = binomial_model.calculate_option()
+    binomial_put = BinomialOptionPricing(
+        stock_price=stock_price,
+        strike_price=strike_price,
+        expiration_time=expiration_time,
+        no_risk_int=no_risk_int,
+        sigma=sigma,
+        steps=steps,
+        option_type="put"
+    )
     
-    # Display price in styled box
+    # Calculate both option prices
+    call_price = binomial_call.calculate_option()
+    put_price = binomial_put.calculate_option()
+    
+    # Display both prices in styled boxes
     st.markdown(f"""
         <div class="metric-container">
-            <div class="metric-{option_type}">
+            <div class="metric-call">
                 <div>
-                    <div class="metric-label">{option_type.upper()} Option Price</div>
-                    <div class="metric-value">${option_price:.2f}</div>
+                    <div class="metric-label">CALL Option Price</div>
+                    <div class="metric-value">${call_price:.2f}</div>
+                </div>
+            </div>
+            <div class="metric-put">
+                <div>
+                    <div class="metric-label">PUT Option Price</div>
+                    <div class="metric-value">${put_price:.2f}</div>
                 </div>
             </div>
         </div>
     """, unsafe_allow_html=True)
     
-    # Display binomial tree
+    # Display binomial tree (using Call model's tree as both trees are identical)
     st.subheader("Binomial Tree Visualization")
-    fig_tree = binomial_model.visualize_tree()
+    fig_tree = binomial_call.visualize_tree()
+    plt.title("Binomial Tree Model for Call & Put Options", fontsize=14, pad=20, color='white')
     st.pyplot(fig_tree)
+
+else:
+    st.markdown("---")
+    st.write("### Model not implemented yet.")
+    st.stop()
