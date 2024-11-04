@@ -2,7 +2,7 @@
 
 Welcome to the **Options Pricing Dashboard**, an interactive platform designed to help you visualize and analyze option prices using various financial models. Whether you're a trader, student, or finance enthusiast, this dashboard offers a comprehensive toolset to understand how different factors influence option valuations.
 
-[![Streamlit App](https://img.shields.io/badge/Streamlit-App-blue)](https://blackschole.streamlit.app/)
+[![Streamlit App](https://img.shields.io/badge/Streamlit-App-blue)]
 
 ## 📚 Table of Contents
 
