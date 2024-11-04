@@ -334,8 +334,8 @@ if model_option == "Black-Scholes":
     """, unsafe_allow_html=True)
 
     st.markdown("")
-    st.header("Options P&L - Interactive Heatmap")
-    st.info("Explore how option PnL fluctuates with varying 'Spot Prices' and 'Volatility' levels based on given input parameters.")
+    st.header("P&L Heatmaps | Call & Put Options")
+    st.info("Explore how option P&L fluctuates with varying 'Spot Prices' and 'Volatility' levels based on given input parameters.")
 
     # Generate Heatmaps
     heatmap_fig_call, heatmap_fig_put = plot_heatmap(
@@ -351,11 +351,11 @@ if model_option == "Black-Scholes":
     col1, col2 = st.columns([1,1], gap="small")
 
     with col1:
-        st.subheader("Call Option PnL Heatmap")
+        st.subheader("Call P&Ls:")
         st.pyplot(heatmap_fig_call)
 
     with col2:
-        st.subheader("Put Option PnL Heatmap")
+        st.subheader("Put P&Ls:")
         st.pyplot(heatmap_fig_put)
 
 elif model_option == "Monte Carlo":

@@ -10,6 +10,7 @@ st.set_page_config(
 
 st.markdown("""
 <style>
+/* Hide Streamlit's default menu and footer */
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 
@@ -17,6 +18,20 @@ footer {visibility: hidden;}
 div.block-container {
     padding-top: 2rem;
     padding-bottom: 2rem;
+}
+
+/* Animated Overlay Background */
+body {
+    background: linear-gradient(45deg, #1e3c72, #2a5298);
+    background-size: 400% 400%;
+    animation: gradientBackground 15s ease infinite;
+    cursor: url('https://cdn.custom-cursor.com/share/2020/09/iron-cross-32x32.png'), auto; /* Custom cursor */
+}
+
+@keyframes gradientBackground {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 /* Title container */
@@ -27,9 +42,10 @@ div.block-container {
     transform: translate(-50%, -50%);
     width: 100%;
     text-align: center;
+    animation: fadeIn 3s ease-in-out; /* Fade-in effect */
 }
 
-/* Typing Animation Styles */
+/* Type Animation Styles */
 .typing-line1 {
     font-size: 2.5rem;
     color: white;
@@ -41,10 +57,9 @@ div.block-container {
     position: relative;
     top: 260px;
 }
-            
-/* Typing Animation Styles */
+
 .typing-line2 {
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: white;
     font-weight: 500;
     margin: 0 auto;
@@ -133,6 +148,12 @@ div.block-container {
     width: 100%;
     text-align: center;
 }
+
+/* Fade-In Animation for Title */
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -140,8 +161,8 @@ div.block-container {
 st.markdown('<div class="title-button-container">', unsafe_allow_html=True)
 
 # Title lines
-st.markdown('<div class="typing-line1">Options Pricing Visualizer:</div>', unsafe_allow_html=True)
-st.markdown('<div class="typing-line2">Black-Scholes, Monte Carlo & Binomial Models</div>', unsafe_allow_html=True)
+st.markdown('<div class="typing-line1">Options Pricing Dashboard:</div>', unsafe_allow_html=True)
+st.markdown('<div class="typing-line2">A Visualizer for Black-Scholes(3D), Monte Carlo & Binomial Models</div>', unsafe_allow_html=True)
 
 # Button with navigation
 if st.button("Try it now!"):
