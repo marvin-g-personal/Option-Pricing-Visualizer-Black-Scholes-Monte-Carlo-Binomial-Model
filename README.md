@@ -19,6 +19,7 @@ Welcome to the **Options Pricing Dashboard**, an interactive platform designed t
   - [Running the Project](#running-the-project)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
+- [🆕 Version](#-version)
 
 ## Overview
 
@@ -145,7 +146,7 @@ Ensure you have the following installed:
    pip install -r requirements.txt
    ```
 
-   *If `requirements.txt` is not provided, you can install the necessary packages manually:*
+   or manually:
 
    ```bash
    pip install streamlit numpy pandas scipy matplotlib seaborn plotly
@@ -157,10 +158,10 @@ Ensure you have the following installed:
 
    Ensure you're in the project's root directory.
 
-2. **Run the Streamlit App**
+2. **Run the Streamlit App with the Landing Page**
 
    ```bash
-   streamlit run streamlit_app.py
+   streamlit run Home.py
    ```
 
 3. **Access the Dashboard**
@@ -192,10 +193,9 @@ Contributions are welcome! Please fork the repository and submit a pull request 
    ```
 
 5. **Open a Pull Request**
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
+   ```bash
+   "Go to the repository on GitHub and open a pull request to main; we'll review and merge your changes or send a message if we need more changes. Any improvements are welcome!"
+   ```
 
 ---
 
