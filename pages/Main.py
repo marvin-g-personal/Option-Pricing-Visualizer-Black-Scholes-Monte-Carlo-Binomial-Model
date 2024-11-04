@@ -74,6 +74,11 @@ section[data-testid="stSidebar"] hr {
     padding: 20px;
     width: 45%;
 }
+
+/* Custom cursor for the entire page */
+html, body {
+    cursor: url('https://cdn-icons-png.flaticon.com/512/25/25231.png'), crosshair; /* Custom cursor */
+}
 </style>
 """, unsafe_allow_html=True)
 

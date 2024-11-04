@@ -14,41 +14,66 @@ st.markdown("""
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 
+/* Ensure body covers full height */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+/* Animated Gradient Overlay Background */
+body {
+    background: linear-gradient(-45deg, #1e3c72, #2a5298);
+    background-size: 400% 400%;
+    animation: gradientBackground 15s ease infinite;
+    cursor: url('https://cdn-icons-png.flaticon.com/512/25/25231.png'), crosshair; 
+}
+
 /* Container styling */
 div.block-container {
     padding-top: 2rem;
     padding-bottom: 2rem;
 }
 
-/* Animated Overlay Background */
-body {
-    background: linear-gradient(45deg, #1e3c72, #2a5298);
-    background-size: 400% 400%;
-    animation: gradientBackground 15s ease infinite;
-    cursor: url('https://cdn.custom-cursor.com/share/2020/09/iron-cross-32x32.png'), auto; /* Custom cursor */
+/* Geometric Moving Pattern Background */
+.geometric-pattern {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; /* Ensure it covers the full height */
+    background: linear-gradient(45deg, #2f3b52 25%, transparent 25%), 
+                linear-gradient(-45deg, #2f3b52 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #2f3b52 75%), 
+                linear-gradient(-45deg, transparent 75%, #2f3b52 75%);
+    background-size: 50px 50px;
+    background-position: 0 0, 0 25px, 25px -25px, -25px 0px;
+    animation: movePattern 10s linear infinite;
 }
 
-@keyframes gradientBackground {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+@keyframes movePattern {
+    0% { background-position: 0 0, 0 25px, 25px -25px, -25px 0px; }
+    100% { background-position: 50px 50px, 50px 75px, 75px 25px, 25px 50px; }
 }
 
 /* Title container */
-.title-container {
+.title-button-container {
     position: absolute;
     top: 80%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 100%;
+    width: 80%;
     text-align: center;
-    animation: fadeIn 3s ease-in-out; /* Fade-in effect */
+    animation: fadeIn 3s ease-in-out;
+    background: rgba(0, 0, 0, 0.5); 
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
-/* Type Animation Styles */
+/* Title Line 1 */
 .typing-line1 {
     font-size: 2.5rem;
-    color: white;
+    color: white; 
     margin: 0 auto;
     text-align: center;
     font-weight: bold;
@@ -56,11 +81,18 @@ body {
     white-space: pre-line;
     position: relative;
     top: 260px;
+    opacity: 0; 
+    animation: slideIn 2s ease-out forwards; 
+    text-shadow: 
+        0 0 5px #9e5ed5, 
+        0 0 10px #9e5ed5, 
+        0 0 15px #9e5ed5; 
 }
 
+/* Title Line 2 */
 .typing-line2 {
     font-size: 2rem;
-    color: white;
+    color: white; 
     font-weight: 500;
     margin: 0 auto;
     text-align: center; 
@@ -69,6 +101,12 @@ body {
     white-space: pre-line;
     position: relative;
     top: 250px;
+    opacity: 0; 
+    animation: slideIn 2s ease-out 2s forwards; 
+    text-shadow: 
+        0 0 5px #9e5ed5, 
+        0 0 10px #9e5ed5, 
+        0 0 15px #9e5ed5; 
 }
 
 /* Button styling */
@@ -77,22 +115,25 @@ body {
     justify-content: center;
     margin-top: 270px;
     width: 100%;
+    opacity: 0; 
+    animation: fadeIn 2s ease-in-out 4s forwards; 
 }
 
 .stButton > button {
     background-color: black;
     color: white;
-    border: none;
+    border: 1px solid white; 
     padding: 20px 40px;
     border-radius: 25px;
     font-size: 40px;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .stButton > button:hover {
-    background-color: white;
+    background-color: #9e5ed5; 
     box-shadow: 0 0 10px #B22222;
-    color: black;
+    color: white;
     transform: scale(1.1);
 }
 
@@ -102,7 +143,7 @@ body {
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: #2F4F4F;
+    background-color: #485162;
     color: white;
     padding: 10px 0;
 }
@@ -133,20 +174,12 @@ body {
     color: #ADD8E6;
     text-decoration: none;
     margin: 0 10px;
+    transition: color 0.3s ease;
 }
 
 .footer a:hover {
+    color: #9e5ed5;
     text-decoration: underline;
-}
-
-/* Title and Button Container Styling */
-.title-button-container {
-    position: absolute;
-    top: 70%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    text-align: center;
 }
 
 /* Fade-In Animation for Title */
@@ -154,10 +187,33 @@ body {
     0% { opacity: 0; }
     100% { opacity: 1; }
 }
+
+/* Slide-In Animations for Titles */
+@keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .typing-line1 {
+        font-size: 2rem;
+    }
+    
+    .typing-line2 {
+        font-size: 1.5rem;
+    }
+    
+    .stButton > button {
+        font-size: 18px;
+        padding: 10px 25px;
+    }
+}
 </style>
 """, unsafe_allow_html=True)
 
 # Center container for content
+st.markdown('<div class="geometric-pattern"></div>', unsafe_allow_html=True)
 st.markdown('<div class="title-button-container">', unsafe_allow_html=True)
 
 # Title lines
@@ -165,11 +221,12 @@ st.markdown('<div class="typing-line1">Options Pricing Dashboard:</div>', unsafe
 st.markdown('<div class="typing-line2">A Visualizer for Black-Scholes(3D), Monte Carlo & Binomial Models</div>', unsafe_allow_html=True)
 
 # Button with navigation
-if st.button("Try it now!"):
+if st.button("Run Visualizations"):
     st.session_state.example_params = True
     st.switch_page("pages/Main.py") 
 
 st.markdown('</div>', unsafe_allow_html=True)
+
 
 # Footer
 st.markdown("""
@@ -180,10 +237,10 @@ st.markdown("""
             Created By: Marvin Gandhi, Bennett Franciosi, Elaine Zou, Vaibhav Singh & Tafari Darosa-Levy
         </div>
         <div class="footer-section right">
-            <a href="https://dataclub.northeastern.edu/" target="_blank">DATA @ NEU</a>
-            <a href="https://linkedin.com/in/marvin-gandhi" target="_blank">LinkedIn</a>
-            <a href="https://github.com/marvin-g-personal/Option-Pricing-Visualizer-Black-Scholes-Monte-Carlo-Binomial-Model/tree/main" target="_blank">GitHub</a>
+            <a href="https://www.instagram.com/dataclubnu/" target="_blank">DATA @ NEU</a>
+            <a href="https://linkedin.com/in/marvin-g-gandhi" target="_blank">LinkedIn</a>
         </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
+
