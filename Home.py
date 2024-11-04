@@ -41,10 +41,10 @@ div.block-container {
     left: 0;
     width: 100%;
     height: 100%; /* Ensure it covers the full height */
-    background: linear-gradient(45deg, #2f3b52 25%, transparent 25%), 
-                linear-gradient(-45deg, #2f3b52 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, #2f3b52 75%), 
-                linear-gradient(-45deg, transparent 75%, #2f3b52 75%);
+    background: linear-gradient(45deg, #2c3e50 25%, transparent 25%), 
+                linear-gradient(-45deg, #2c3e50 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #2c3e50 75%), 
+                linear-gradient(-45deg, transparent 75%, #2c3e50 75%);
     background-size: 50px 50px;
     background-position: 0 0, 0 25px, 25px -25px, -25px 0px;
     animation: movePattern 10s linear infinite;
@@ -80,13 +80,13 @@ div.block-container {
     padding: 10px;
     white-space: pre-line;
     position: relative;
-    top: 260px;
+    top: 255px;
     opacity: 0; 
     animation: slideIn 2s ease-out forwards; 
     text-shadow: 
-        0 0 5px #9e5ed5, 
-        0 0 10px #9e5ed5, 
-        0 0 15px #9e5ed5; 
+        0 0 5px #875D2C, 
+        0 0 10px #875D2C, 
+        0 0 15px #875D2C; 
 }
 
 /* Title Line 2 */
@@ -100,20 +100,20 @@ div.block-container {
     padding: 5px;
     white-space: pre-line;
     position: relative;
-    top: 250px;
+    top: 245px;
     opacity: 0; 
     animation: slideIn 2s ease-out 2s forwards; 
     text-shadow: 
-        0 0 5px #9e5ed5, 
-        0 0 10px #9e5ed5, 
-        0 0 15px #9e5ed5; 
+        0 0 5px #875D2C, 
+        0 0 10px #875D2C, 
+        0 0 15px #875D2C; 
 }
 
 /* Button styling */
 .stButton {
     display: flex;
     justify-content: center;
-    margin-top: 270px;
+    margin-top: 265px;
     width: 100%;
     opacity: 0; 
     animation: fadeIn 2s ease-in-out 4s forwards; 
@@ -131,7 +131,7 @@ div.block-container {
 }
 
 .stButton > button:hover {
-    background-color: #9e5ed5; 
+    background-color: #b94242; 
     box-shadow: 0 0 10px #B22222;
     color: white;
     transform: scale(1.1);
@@ -194,6 +194,30 @@ div.block-container {
     to { transform: translateY(0); opacity: 1; }
 }
 
+/* Thick black line at the top */
+.custom-line-bottom {
+    height: 50px;
+    background-color: black;
+    width: 100%; 
+    position: fixed;
+    bottom: 45px;
+    left: 0; 
+    z-index: 1000;
+    pointer-events: none;
+}
+
+/* Thick black line at the bottom */
+.custom-line-top {
+    height: 150px;
+    background-color: black;
+    width: 100%;
+    position: fixed;
+    bottom: 875px;
+    left: 0; 
+    z-index: 1000;
+    pointer-events: none;
+}
+
 /* Responsiveness */
 @media (max-width: 768px) {
     .typing-line1 {
@@ -209,24 +233,37 @@ div.block-container {
         padding: 10px 25px;
     }
 }
+
+/* Remove spacing around footer links */
+.footer-section a {
+    display: inline; 
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+}
 </style>
 """, unsafe_allow_html=True)
 
-# Center container for content
+# Add thick black line at the top
+st.markdown('<div class="custom-line-top"></div>', unsafe_allow_html=True)
+
+# Geometric pattern background
 st.markdown('<div class="geometric-pattern"></div>', unsafe_allow_html=True)
+
+# Title and Button Container
 st.markdown('<div class="title-button-container">', unsafe_allow_html=True)
 
 # Title lines
 st.markdown('<div class="typing-line1">Options Pricing Dashboard:</div>', unsafe_allow_html=True)
-st.markdown('<div class="typing-line2">A Visualizer for Black-Scholes(3D), Monte Carlo & Binomial Models</div>', unsafe_allow_html=True)
+st.markdown('<div class="typing-line2">A Visualizer for Black-Scholes, Monte Carlo & Binomial Models</div>', unsafe_allow_html=True)
 
 # Button with navigation
 if st.button("Run Visualizations"):
     st.session_state.example_params = True
     st.switch_page("pages/Main.py") 
 
+# Close title-button-container div
 st.markdown('</div>', unsafe_allow_html=True)
-
 
 # Footer
 st.markdown("""
@@ -234,13 +271,21 @@ st.markdown("""
     <div class="footer-content">
         <div class="footer-section left">© marvin-g-personal</div>
         <div class="footer-section">
-            Created By: Marvin Gandhi, Bennett Franciosi, Elaine Zou, Vaibhav Singh & Tafari Darosa-Levy
+            Created By:
+            <a href="https://www.linkedin.com/in/marvin-gandhi/" target="_blank">Marvin Gandhi</a>,
+            <a href="https://www.linkedin.com/in/bennett-franciosi-5b8454324/" target="_blank">Bennett Franciosi</a>,
+            <a href="https://www.linkedin.com/in/elaine-zou/" target="_blank">Elaine Zou</a>,
+            <a href="https://www.linkedin.com/in/vaibhav-singh-548b861b0/" target="_blank">Vaibhav Singh</a>,
+            <a href="https://www.linkedin.com/in/tafari-darosa-levy-337b65262/" target="_blank">Tafari Darosa-Levy</a>
         </div>
         <div class="footer-section right">
             <a href="https://www.instagram.com/dataclubnu/" target="_blank">DATA @ NEU</a>
-            <a href="https://linkedin.com/in/marvin-g-gandhi" target="_blank">LinkedIn</a>
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=gandhi.mar@northeastern.edu&su=Contact%20Request&body=Hello%2C%0A%0AI%20would%20like%20to%20get%20in%20touch%20with%20you." target="_blank" style="margin-left: 10px;">Contact</a>
         </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
+
+# Add thick black line at the bottom
+st.markdown('<div class="custom-line-bottom"></div>', unsafe_allow_html=True)
 
