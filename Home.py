@@ -84,15 +84,16 @@ div.block-container {
     opacity: 0; 
     animation: slideIn 2s ease-out forwards; 
     text-shadow: 
-        0 0 5px #875D2C, 
-        0 0 10px #875D2C, 
-        0 0 15px #875D2C; 
+        0 0 10px #000000, 
+        0 0 10px #000000, 
+        0 0 15px #000000; 
 }
 
 /* Title Line 2 */
 .typing-line2 {
     font-size: 2rem;
     color: white; 
+    font-style: italic;
     font-weight: 500;
     margin: 0 auto;
     text-align: center; 
@@ -104,9 +105,9 @@ div.block-container {
     opacity: 0; 
     animation: slideIn 2s ease-out 2s forwards; 
     text-shadow: 
-        0 0 5px #875D2C, 
-        0 0 10px #875D2C, 
-        0 0 15px #875D2C; 
+        0 0 10px #000000, 
+        0 0 10px #000000, 
+        0 0 15px #000000; 
 }
 
 /* Button styling */
