@@ -263,12 +263,12 @@ with st.sidebar:
     # Model Selection
     model_option = st.selectbox(
         "Select Pricing Model",
-        ("Black-Scholes", "Monte Carlo", "Binomial", "3D Black-Scholes Visualizer")
+        ("Black-Scholes", "Monte Carlo", "Binomial", "3D Black-Scholes")
     )
 
     st.markdown("---")
     
-    if model_option == "Black-Scholes" or model_option == '3D Black-Scholes Visualizer':
+    if model_option == "Black-Scholes": # model_option == '3D Black-Scholes Visualizer'
         current_price = st.number_input("Current Asset Price", value=100.0)
         strike = st.number_input("Strike Price", value=100.0)
         time_to_maturity = st.number_input("Time to Maturity (Years)", value=1.0)
@@ -302,6 +302,58 @@ with st.sidebar:
         no_risk_int = st.number_input("Risk-Free Rate", value=0.05)
         sigma = st.number_input("Volatility (σ)", value=0.3)
         steps = st.number_input("Number of Steps", value=10)
+    elif model_option == "3D Black-Scholes":
+        st.sidebar.header('Model Parameters')
+        st.sidebar.write('Adjust the parameters for the Black-Scholes model.')
+        risk_free_rate = st.sidebar.number_input(
+            'Risk-Free Rate (e.g., 0.015 for 1.5%)',
+            value=0.015,
+            format="%.4f"
+        )
+
+        dividend_yield = st.sidebar.number_input(
+            'Dividend Yield (e.g., 0.013 for 1.3%)',
+            value=0.013,
+            format="%.4f"
+        )
+
+        st.sidebar.header('Visualization Parameters')
+        y_axis_option = st.sidebar.selectbox(
+            'Select Y-axis:',
+            ('Strike Price ($)', 'Moneyness')
+        )
+
+        st.sidebar.header('Ticker Symbol')
+        ticker_symbol = st.sidebar.text_input(
+            'Enter Ticker Symbol',
+            value='SPY',
+            max_chars=10
+        ).upper()
+
+        st.sidebar.header('Strike Price Filter Parameters')
+
+        min_strike_pct = st.sidebar.number_input(
+            'Minimum Strike Price (% of Spot Price)',
+            min_value=50.0,
+            max_value=199.0,
+            value=80.0,
+            step=1.0,
+            format="%.1f"
+        )
+
+        max_strike_pct = st.sidebar.number_input(
+            'Maximum Strike Price (% of Spot Price)',
+            min_value=51.0,
+            max_value=200.0,
+            value=120.0,
+            step=1.0,
+            format="%.1f"
+        )
+
+        if min_strike_pct >= max_strike_pct:
+            st.sidebar.error('Minimum percentage must be less than maximum percentage.')
+            st.stop()
+
     else:
         st.markdown("---")
         st.write("### Model not implemented yet.")
@@ -368,123 +420,9 @@ if model_option == "Black-Scholes":
         st.subheader("Put P&Ls:")
         st.pyplot(heatmap_fig_put)
 
-elif model_option == "Monte Carlo":
-    st.title("🧮 Monte Carlo Model")
-    
-    # Run simulation
-    sims = monte_carlo_sim(current_price, interest_rate, volatility, time_to_maturity, steps, num_sims)
-    
-    # Calculate option prices
-    call_price, call_se = calc_opt_price(current_price, interest_rate, volatility, time_to_maturity, 
-                                     steps, num_sims, strike, 'call')
-    put_price, put_se = calc_opt_price(current_price, interest_rate, volatility, time_to_maturity, 
-                                   steps, num_sims, strike, 'put')
-    
-    # Display prices in styled boxes
-    st.markdown(f"""
-        <div class="metric-container">
-            <div class="metric-call">
-                <div>
-                    <div class="metric-label">CALL Value (± {call_se:.3f})</div>
-                    <div class="metric-value">${call_price:.2f}</div>
-                </div>
-            </div>
-            <div class="metric-put">
-                <div>
-                    <div class="metric-label">PUT Value (± {put_se:.3f})</div>
-                    <div class="metric-value">${put_price:.2f}</div>
-                </div>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    # Create two columns for plots
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.subheader("Monte Carlo Simulation Paths")
-        fig_sim = visualize(sims)
-        st.pyplot(fig_sim)
-    
-    with col2:
-        st.subheader("Price Convergence Distribution")
-        # Modify visualize_convergence to return figure
-        fig_conv = plt.figure(figsize=(10, 8))
-        x1 = np.linspace(call_price-3*call_se, call_price-call_se, 100)
-        x2 = np.linspace(call_price-call_se, call_price+call_se, 100)
-        x3 = np.linspace(call_price+call_se, call_price+3*call_se, 100)
-        
-        s1 = stats.norm.pdf(x1, call_price, call_se)
-        s2 = stats.norm.pdf(x2, call_price, call_se)
-        s3 = stats.norm.pdf(x3, call_price, call_se)
-        
-        plt.fill_between(x1, s1, color='tab:blue', label='> 1 StDev')
-        plt.fill_between(x2, s2, color='cornflowerblue', label='±1 StDev')
-        plt.fill_between(x3, s3, color='tab:blue')
-        
-        plt.plot([call_price, call_price], [0, max(s2)*1.1], 'k',
-                label='Theoretical Value')
-        
-        plt.ylabel("Probability Density Function")
-        plt.xlabel("Option Price ($)")
-        plt.title("Option Price Distribution")
-        plt.legend()
-        plt.grid(True, alpha=0.3)
-        plt.tight_layout()
-        st.pyplot(fig_conv)
 
-elif model_option == "Binomial":
-    st.title("🌳 Binomial Model")
-    
-    # Create Binomial model instances for both Call and Put
-    binomial_call = BinomialOptionPricing(
-        stock_price=stock_price,
-        strike_price=strike_price,
-        expiration_time=expiration_time,
-        no_risk_int=no_risk_int,
-        sigma=sigma,
-        steps=steps,
-        option_type="call"
-    )
-    
-    binomial_put = BinomialOptionPricing(
-        stock_price=stock_price,
-        strike_price=strike_price,
-        expiration_time=expiration_time,
-        no_risk_int=no_risk_int,
-        sigma=sigma,
-        steps=steps,
-        option_type="put"
-    )
-    
-    # Calculate both option prices
-    call_price = binomial_call.calculate_option()
-    put_price = binomial_put.calculate_option()
-    
-    st.markdown(f"""
-        <div class="metric-container">
-            <div class="metric-call">
-                <div>
-                    <div class="metric-label">CALL Value</div>
-                    <div class="metric-value">${call_price:.2f}</div>
-                </div>
-            </div>
-            <div class="metric-put">
-                <div>
-                    <div class="metric-label">PUT Value</div>
-                    <div class="metric-value">${put_price:.2f}</div>
-                </div>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    st.subheader("Binomial Tree Visualization")
-    fig_tree = binomial_call.visualize_tree()
-    plt.title("Binomial Tree Model for Call & Put Options", fontsize=14, pad=20, color='white')
-    st.pyplot(fig_tree)
 
-elif model_option == '3D Black-Scholes Visualizer':
-
+elif model_option == '3D Black-Scholes':
 
     st.title('Implied Volatility Surface')
 
@@ -508,57 +446,54 @@ elif model_option == '3D Black-Scholes Visualizer':
 
         return implied_vol
 
-    st.sidebar.header('Model Parameters')
-    st.sidebar.write('Adjust the parameters for the Black-Scholes model.')
+    # risk_free_rate = st.sidebar.number_input(
+    #     'Risk-Free Rate (e.g., 0.015 for 1.5%)',
+    #     value=0.015,
+    #     format="%.4f"
+    # )
 
-    risk_free_rate = st.sidebar.number_input(
-        'Risk-Free Rate (e.g., 0.015 for 1.5%)',
-        value=0.015,
-        format="%.4f"
-    )
+    # dividend_yield = st.sidebar.number_input(
+    #     'Dividend Yield (e.g., 0.013 for 1.3%)',
+    #     value=0.013,
+    #     format="%.4f"
+    # )
 
-    dividend_yield = st.sidebar.number_input(
-        'Dividend Yield (e.g., 0.013 for 1.3%)',
-        value=0.013,
-        format="%.4f"
-    )
+    # st.sidebar.header('Visualization Parameters')
+    # y_axis_option = st.sidebar.selectbox(
+    #     'Select Y-axis:',
+    #     ('Strike Price ($)', 'Moneyness')
+    # )
 
-    st.sidebar.header('Visualization Parameters')
-    y_axis_option = st.sidebar.selectbox(
-        'Select Y-axis:',
-        ('Strike Price ($)', 'Moneyness')
-    )
+    # st.sidebar.header('Ticker Symbol')
+    # ticker_symbol = st.sidebar.text_input(
+    #     'Enter Ticker Symbol',
+    #     value='SPY',
+    #     max_chars=10
+    # ).upper()
 
-    st.sidebar.header('Ticker Symbol')
-    ticker_symbol = st.sidebar.text_input(
-        'Enter Ticker Symbol',
-        value='SPY',
-        max_chars=10
-    ).upper()
+    # st.sidebar.header('Strike Price Filter Parameters')
 
-    st.sidebar.header('Strike Price Filter Parameters')
+    # min_strike_pct = st.sidebar.number_input(
+    #     'Minimum Strike Price (% of Spot Price)',
+    #     min_value=50.0,
+    #     max_value=199.0,
+    #     value=80.0,
+    #     step=1.0,
+    #     format="%.1f"
+    # )
 
-    min_strike_pct = st.sidebar.number_input(
-        'Minimum Strike Price (% of Spot Price)',
-        min_value=50.0,
-        max_value=199.0,
-        value=80.0,
-        step=1.0,
-        format="%.1f"
-    )
+    # max_strike_pct = st.sidebar.number_input(
+    #     'Maximum Strike Price (% of Spot Price)',
+    #     min_value=51.0,
+    #     max_value=200.0,
+    #     value=120.0,
+    #     step=1.0,
+    #     format="%.1f"
+    # )
 
-    max_strike_pct = st.sidebar.number_input(
-        'Maximum Strike Price (% of Spot Price)',
-        min_value=51.0,
-        max_value=200.0,
-        value=120.0,
-        step=1.0,
-        format="%.1f"
-    )
-
-    if min_strike_pct >= max_strike_pct:
-        st.sidebar.error('Minimum percentage must be less than maximum percentage.')
-        st.stop()
+    # if min_strike_pct >= max_strike_pct:
+    #     st.sidebar.error('Minimum percentage must be less than maximum percentage.')
+    #     st.stop()
 
     ticker = yf.Ticker(ticker_symbol)
 
@@ -687,6 +622,122 @@ elif model_option == '3D Black-Scholes Visualizer':
             st.plotly_chart(fig)
 
             st.write("---")
+
+
+elif model_option == "Monte Carlo":
+    st.title("🧮 Monte Carlo Model")
+    
+    # Run simulation
+    sims = monte_carlo_sim(current_price, interest_rate, volatility, time_to_maturity, steps, num_sims)
+    
+    # Calculate option prices
+    call_price, call_se = calc_opt_price(current_price, interest_rate, volatility, time_to_maturity, 
+                                     steps, num_sims, strike, 'call')
+    put_price, put_se = calc_opt_price(current_price, interest_rate, volatility, time_to_maturity, 
+                                   steps, num_sims, strike, 'put')
+    
+    # Display prices in styled boxes
+    st.markdown(f"""
+        <div class="metric-container">
+            <div class="metric-call">
+                <div>
+                    <div class="metric-label">CALL Value (± {call_se:.3f})</div>
+                    <div class="metric-value">${call_price:.2f}</div>
+                </div>
+            </div>
+            <div class="metric-put">
+                <div>
+                    <div class="metric-label">PUT Value (± {put_se:.3f})</div>
+                    <div class="metric-value">${put_price:.2f}</div>
+                </div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Create two columns for plots
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("Monte Carlo Simulation Paths")
+        fig_sim = visualize(sims)
+        st.pyplot(fig_sim)
+    
+    with col2:
+        st.subheader("Price Convergence Distribution")
+        # Modify visualize_convergence to return figure
+        fig_conv = plt.figure(figsize=(10, 8))
+        x1 = np.linspace(call_price-3*call_se, call_price-call_se, 100)
+        x2 = np.linspace(call_price-call_se, call_price+call_se, 100)
+        x3 = np.linspace(call_price+call_se, call_price+3*call_se, 100)
+        
+        s1 = stats.norm.pdf(x1, call_price, call_se)
+        s2 = stats.norm.pdf(x2, call_price, call_se)
+        s3 = stats.norm.pdf(x3, call_price, call_se)
+        
+        plt.fill_between(x1, s1, color='tab:blue', label='> 1 StDev')
+        plt.fill_between(x2, s2, color='cornflowerblue', label='±1 StDev')
+        plt.fill_between(x3, s3, color='tab:blue')
+        
+        plt.plot([call_price, call_price], [0, max(s2)*1.1], 'k',
+                label='Theoretical Value')
+        
+        plt.ylabel("Probability Density Function")
+        plt.xlabel("Option Price ($)")
+        plt.title("Option Price Distribution")
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        st.pyplot(fig_conv)
+
+elif model_option == "Binomial":
+    st.title("🌳 Binomial Model")
+    
+    # Create Binomial model instances for both Call and Put
+    binomial_call = BinomialOptionPricing(
+        stock_price=stock_price,
+        strike_price=strike_price,
+        expiration_time=expiration_time,
+        no_risk_int=no_risk_int,
+        sigma=sigma,
+        steps=steps,
+        option_type="call"
+    )
+    
+    binomial_put = BinomialOptionPricing(
+        stock_price=stock_price,
+        strike_price=strike_price,
+        expiration_time=expiration_time,
+        no_risk_int=no_risk_int,
+        sigma=sigma,
+        steps=steps,
+        option_type="put"
+    )
+    
+    # Calculate both option prices
+    call_price = binomial_call.calculate_option()
+    put_price = binomial_put.calculate_option()
+    
+    st.markdown(f"""
+        <div class="metric-container">
+            <div class="metric-call">
+                <div>
+                    <div class="metric-label">CALL Value</div>
+                    <div class="metric-value">${call_price:.2f}</div>
+                </div>
+            </div>
+            <div class="metric-put">
+                <div>
+                    <div class="metric-label">PUT Value</div>
+                    <div class="metric-value">${put_price:.2f}</div>
+                </div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    st.subheader("Binomial Tree Visualization")
+    fig_tree = binomial_call.visualize_tree()
+    plt.title("Binomial Tree Model for Call & Put Options", fontsize=14, pad=20, color='white')
+    st.pyplot(fig_tree)
 
 else:
     st.markdown("---")
