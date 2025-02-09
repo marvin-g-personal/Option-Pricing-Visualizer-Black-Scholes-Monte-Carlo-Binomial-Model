@@ -5,7 +5,7 @@ An interactive platform designed to help you visualize and analyze option prices
 This project was presented to over a 100 students the DATA Club's semester-long project contest, 
 getting up to 200 users it's first week. It has been deployed and useable at the following webpage:
 
-[![Streamlit App](https://options-pricing-visualizer.streamlit.app/)]
+[[Streamlit App](https://options-pricing-visualizer.streamlit.app/)]
 
 ## 🚀 Features
 1. **Interactive Visualization**:
