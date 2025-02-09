@@ -257,8 +257,8 @@ st.markdown("""
             <a href="https://www.linkedin.com/in/marvin-gandhi/" target="_blank">Marvin Gandhi</a>,
             <a href="https://www.linkedin.com/in/bennett-franciosi-5b8454324/" target="_blank">Bennett Franciosi</a>,
             <a href="https://www.linkedin.com/in/elaine-zou/" target="_blank">Elaine Zou</a>,
-            <a href="https://www.linkedin.com/in/vaibhav-singh-548b861b0/" target="_blank">Vaibhav Singh</a>,
-            <a href="https://www.linkedin.com/in/tafari-darosa-levy-337b65262/" target="_blank">Tafari Darosa-Levy</a>
+            <a href="https://www.linkedin.com/in/vaibhav-singh-548b861b0/" target="_blank">Vaibhav Singh</a>
+            <a href="https://www.linkedin.com/in/tafari-darosa-levy-337b65262/" target="_blank">& Tafari Darosa-Levy</a>
         </div>
     </div>
 </div>
