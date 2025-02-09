@@ -24,19 +24,15 @@ def monte_carlo_sim(S: float, r: float, vol: float, T: float, steps: int, num: i
     dt = T / steps
     nudt = (r - 0.5 * vol ** 2) * dt
     sidt = vol * np.sqrt(dt)
-    
-    # Precompute random shocks
+
     random_shocks = np.random.normal(0, 1, (num, steps))
-    # Initialize price paths
     sims = np.zeros((num, steps + 1))
     sims[:, 0] = S
-    # Calculate increments
     sims[:, 1:] = S * np.exp(np.cumsum(nudt + sidt * random_shocks, axis=1))
     
     return sims
 
 
-# visualize the monte carlo simulation
 def visualize(sims: np.ndarray) -> plt.Figure:
     """
     Plots the Monte Carlo simulation paths with diverse colors.
@@ -50,51 +46,44 @@ def visualize(sims: np.ndarray) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(10, 8), facecolor='#1E1E1E')
     ax.set_facecolor('#1E1E1E')
     
-    # Create a diverse color palette
     colors = [
-        '#FF0000',  # Red
-        '#00FF00',  # Green
-        '#0000FF',  # Blue
-        '#FFD700',  # Gold
-        '#FF1493',  # Deep Pink
-        '#00FFFF',  # Cyan
-        '#FF4500',  # Orange Red
-        '#9400D3',  # Dark Violet
-        '#32CD32',  # Lime Green
-        '#FF69B4',  # Hot Pink
-        '#4169E1',  # Royal Blue
-        '#FF8C00',  # Dark Orange
-        '#8A2BE2',  # Blue Violet
-        '#20B2AA',  # Light Sea Green
-        '#FF6347'   # Tomato
+        '#FF0000',  
+        '#00FF00',  
+        '#0000FF', 
+        '#FFD700', 
+        '#FF1493',  
+        '#00FFFF',  
+        '#FF4500',  
+        '#9400D3',  
+        '#32CD32', 
+        '#FF69B4', 
+        '#4169E1',  
+        '#FF8C00',  
+        '#8A2BE2',  
+        '#20B2AA',  
+        '#FF6347' 
     ]
     
     num_paths = sims.shape[0]
-    colors = colors * (num_paths // len(colors) + 1)  # Repeat colors if necessary
+    colors = colors * (num_paths // len(colors) + 1)
     
-    # Plot each path with a different color and reduced alpha
     for i, path in enumerate(sims):
         ax.plot(path, color=colors[i], alpha=0.6, linewidth=1)
     
-    # Add mean path with higher visibility
     mean_path = np.mean(sims, axis=0)
     ax.plot(mean_path, color='white', linewidth=2, label='Mean Path', zorder=num_paths+1)
     
-    # Customize the plot
     ax.set_xlabel("Time Steps", fontsize=12, color='white')
     ax.set_ylabel("Stock Price ($)", fontsize=12, color='white')
     ax.set_title("Monte Carlo Simulation Paths", fontsize=14, color='white', pad=20)
     ax.grid(True, alpha=0.2)
     
-    # Customize ticks
     ax.tick_params(colors='white')
     for spine in ax.spines.values():
         spine.set_color('white')
     
-    # Add legend
     ax.legend(facecolor='#1E1E1E', edgecolor='white', labelcolor='white')
     
-    # Adjust layout
     fig.tight_layout()
     
     return fig
@@ -147,41 +136,33 @@ def visualize_convergence(C0: float, SE: float, prem: float) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(10, 8), facecolor='#1E1E1E')
     ax.set_facecolor('#1E1E1E')
     
-    # Calculate ranges for different standard deviation regions
     x1 = np.linspace(C0 - 3 * SE, C0 - SE, 100)
     x2 = np.linspace(C0 - SE, C0 + SE, 100)
     x3 = np.linspace(C0 + SE, C0 + 3 * SE, 100)
     
-    # Calculate PDF values
     s1 = stats.norm.pdf(x1, C0, SE)
     s2 = stats.norm.pdf(x2, C0, SE)
     s3 = stats.norm.pdf(x3, C0, SE)
-    
-    # Plot the distributions without normalization
+
     ax.fill_between(x1, s1, color='tab:blue', alpha=0.3, label='> 1 StDev')
     ax.fill_between(x2, s2, color='cornflowerblue', alpha=0.6, label='±1 StDev')
     ax.fill_between(x3, s3, color='tab:blue', alpha=0.3)
     
-    # Plot vertical lines for theoretical and market values
     ax.plot([C0, C0], [0, stats.norm.pdf(C0, C0, SE)], 'white', linewidth=2, label='Theoretical Value')
     ax.plot([prem, prem], [0, stats.norm.pdf(C0, C0, SE)], 'r', linewidth=2, label='Market Value')
     
-    # Customize the plot
     ax.set_ylabel("Probability Density", fontsize=12, color='white')
     ax.set_xlabel("Option Price ($)", fontsize=12, color='white')
     ax.set_title("Option Price Distribution", fontsize=14, color='white', pad=20)
     
-    # Set y-axis limits based on the maximum PDF value
     max_pdf = max(np.max(s1), np.max(s2), np.max(s3))
     ax.set_ylim(0, max_pdf * 1.1)
     
-    # Customize ticks and grid
     ax.tick_params(colors='white')
     ax.grid(True, alpha=0.2)
     for spine in ax.spines.values():
         spine.set_color('white')
     
-    # Add legend with custom styling
     ax.legend(facecolor='#1E1E1E', edgecolor='white', labelcolor='white')
     
     fig.tight_layout()

@@ -9,8 +9,6 @@ import seaborn as sns
 from models.Binomial import BinomialOptionPricing
 from models.MonteCarlo import monte_carlo_sim, calc_opt_price, visualize, stats
 
-#######################
-# Page configuration
 st.set_page_config(
     page_title="Option Pricing Model",
     page_icon="💰",
@@ -20,33 +18,29 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-/* Move sidebar to the right */
 section[data-testid="stSidebar"] {
     left: unset !important;
     right: 0 !important;
-    padding-top: 20px; /* Added padding to the top of the sidebar */
+    padding-top: 20px;
 }
 
-/* Center all text in the app */
 h1, h2, h3, h4, h5, h6, p, div {
     text-align: center;
 }
 
-/* Center text in the sidebar, except input boxes */
 section[data-testid="stSidebar"] .stSelectbox, 
 section[data-testid="stSidebar"] .stNumberInput, 
 section[data-testid="stSidebar"] .stSlider {
-    text-align: left; /* Keep input boxes left-aligned */
+    text-align: left;
 }
 
 section[data-testid="stSidebar"] .stMarkdown {
-    text-align: center; /* Center text in markdown */
+    text-align: center;
 }
 
-/* Adjust spacing for the separator */
 section[data-testid="stSidebar"] hr {
-    margin-top: 20px; /* Add space above the separator */
-    margin-bottom: 20px; /* Add space below the separator */
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .metric-container {
@@ -75,15 +69,14 @@ section[data-testid="stSidebar"] hr {
     width: 45%;
 }
 
-/* Custom cursor for the entire page */
 html, body {
-    cursor: url('https://cdn-icons-png.flaticon.com/512/25/25231.png'), crosshair; /* Custom cursor */
+    cursor: url('https://cdn-icons-png.flaticon.com/512/25/25231.png'), crosshair;
 }
 </style>
 """, unsafe_allow_html=True)
 
 #######################
-# BlackScholes class definition
+# BlackScholes class (changed model one; had flaws)
 class BlackScholes:
     def __init__(
         self,
@@ -122,7 +115,7 @@ class BlackScholes:
         self.call_price = call_price
         self.put_price = put_price
 
-        # Calculate PnL
+        # PnL
         if self.option_type == 'call':
             self.pnl = call_price - self.purchase_price
         else:
@@ -137,20 +130,18 @@ class BlackScholes:
         self.call_gamma = norm.pdf(d1) / (
             self.strike * self.volatility * sqrt(self.time_to_maturity)
         )
-        self.put_gamma = self.call_gamma  # Corrected typo
+        self.put_gamma = self.call_gamma
 
         return call_price, put_price
 
-#######################
-# Function to generate heatmaps
 def plot_heatmap(bs_model, spot_range, vol_range, strike, purchase_price_call, purchase_price_put):
-    # Calculate PnL matrices
+    # PnL matrices
     call_pnl = np.zeros((len(vol_range), len(spot_range)))
     put_pnl = np.zeros((len(vol_range), len(spot_range)))
     
     for i, vol in enumerate(vol_range):
         for j, spot in enumerate(spot_range):
-            # Calculate CALL PnL
+            # CALL PnL
             bs_temp_call = BlackScholes(
                 time_to_maturity=bs_model.time_to_maturity,
                 strike=strike,
@@ -163,7 +154,7 @@ def plot_heatmap(bs_model, spot_range, vol_range, strike, purchase_price_call, p
             call_price, _ = bs_temp_call.calculate_prices()
             call_pnl[i, j] = call_price - purchase_price_call
 
-            # Calculate PUT PnL
+            # PUT PnL
             bs_temp_put = BlackScholes(
                 time_to_maturity=bs_model.time_to_maturity,
                 strike=strike,
@@ -180,10 +171,10 @@ def plot_heatmap(bs_model, spot_range, vol_range, strike, purchase_price_call, p
     fig_call, ax_call = plt.subplots(figsize=(15, 12)) 
     fig_put, ax_put = plt.subplots(figsize=(15, 12))   
 
-    # Custom colormap
+    # colormap
     custom_cmap = sns.diverging_palette(10, 133, as_cmap=True)
 
-    # Calculate vmin and vmax for consistent color scaling
+    # vmin and vmax for consistent color scaling
     vmin = min(call_pnl.min(), put_pnl.min())
     vmax = max(call_pnl.max(), put_pnl.max())
     
@@ -191,6 +182,7 @@ def plot_heatmap(bs_model, spot_range, vol_range, strike, purchase_price_call, p
     scale_factor = 0.5
     vmin, vmax = -abs_max * scale_factor, abs_max * scale_factor
 
+    # CALL PnL
     sns.heatmap(
         call_pnl,
         ax=ax_call,
@@ -201,19 +193,19 @@ def plot_heatmap(bs_model, spot_range, vol_range, strike, purchase_price_call, p
         cbar_kws={
             'label': 'PnL ($)',
             'orientation': 'horizontal',
-            'pad': 0.1,        # Reduced padding
-            'aspect': 50,      # Made colorbar thinner
-            'shrink': 0.8      # Made colorbar shorter
+            'pad': 0.1,       
+            'aspect': 50,    
+            'shrink': 0.8    
         },
         xticklabels=[f'{x:.1f}' for x in spot_range],
         yticklabels=[f'{x:.2f}' for x in vol_range],
-        annot_kws={'size': 12},  # Increased annotation size
+        annot_kws={'size': 12}, 
         square=True,
         vmin=vmin,
         vmax=vmax
     )
 
-    # Plot PUT heatmap with enhanced styling and reduced margins
+    # Plot PUT heatmap
     sns.heatmap(
         put_pnl,
         ax=ax_put,
@@ -224,13 +216,13 @@ def plot_heatmap(bs_model, spot_range, vol_range, strike, purchase_price_call, p
         cbar_kws={
             'label': 'PnL ($)',
             'orientation': 'horizontal',
-            'pad': 0.1,        # Reduced padding
-            'aspect': 50,      # Made colorbar thinner
-            'shrink': 0.8      # Made colorbar shorter
+            'pad': 0.1,       
+            'aspect': 50,     
+            'shrink': 0.8    
         },
         xticklabels=[f'{x:.1f}' for x in spot_range],
         yticklabels=[f'{x:.2f}' for x in vol_range],
-        annot_kws={'size': 12},  # Increased annotation size
+        annot_kws={'size': 12},
         square=True,
         vmin=vmin,
         vmax=vmax
@@ -251,8 +243,6 @@ def plot_heatmap(bs_model, spot_range, vol_range, strike, purchase_price_call, p
 
     return fig_call, fig_put
 
-#######################
-# Sidebar for User Inputs
 with st.sidebar:
     
     # Model Selection
@@ -302,13 +292,9 @@ with st.sidebar:
         st.write("### Model not implemented yet.")
         st.stop()
 
-#######################
-# Main Content
 if model_option == "Black-Scholes":
-    # Main Page for Output Display
     st.title("🔮 Black-Scholes Model")
 
-    # Instantiate BlackScholes class
     bs_model = BlackScholes(
         time_to_maturity=time_to_maturity,
         strike=strike,
@@ -320,7 +306,6 @@ if model_option == "Black-Scholes":
     )
     call_price, put_price = bs_model.calculate_prices()
 
-    # Display Call and Put Values
     st.markdown(f"""
         <div class="metric-container">
             <div class="metric-call">
@@ -342,7 +327,6 @@ if model_option == "Black-Scholes":
     st.header("P&L Heatmaps | Call & Put Options")
     st.info("Explore how option P&L fluctuates with varying 'Spot Prices' and 'Volatility' levels based on given input parameters.")
 
-    # Generate Heatmaps
     heatmap_fig_call, heatmap_fig_put = plot_heatmap(
         bs_model,
         spot_range,
@@ -352,7 +336,6 @@ if model_option == "Black-Scholes":
         purchase_price_put
     )
 
-    # Display Heatmaps Side by Side
     col1, col2 = st.columns([1,1], gap="small")
 
     with col1:
@@ -366,16 +349,12 @@ if model_option == "Black-Scholes":
 elif model_option == "Monte Carlo":
     st.title("🧮 Monte Carlo Model")
     
-    # Run simulation
     sims = monte_carlo_sim(current_price, interest_rate, volatility, time_to_maturity, steps, num_sims)
-    
-    # Calculate option prices
     call_price, call_se = calc_opt_price(current_price, interest_rate, volatility, time_to_maturity, 
                                      steps, num_sims, strike, 'call')
     put_price, put_se = calc_opt_price(current_price, interest_rate, volatility, time_to_maturity, 
                                    steps, num_sims, strike, 'put')
     
-    # Display prices in styled boxes
     st.markdown(f"""
         <div class="metric-container">
             <div class="metric-call">
@@ -393,7 +372,6 @@ elif model_option == "Monte Carlo":
         </div>
     """, unsafe_allow_html=True)
     
-    # Create two columns for plots
     col1, col2 = st.columns(2)
     
     with col1:
@@ -403,7 +381,6 @@ elif model_option == "Monte Carlo":
     
     with col2:
         st.subheader("Price Convergence Distribution")
-        # Modify visualize_convergence to return figure
         fig_conv = plt.figure(figsize=(10, 8))
         x1 = np.linspace(call_price-3*call_se, call_price-call_se, 100)
         x2 = np.linspace(call_price-call_se, call_price+call_se, 100)
@@ -431,7 +408,6 @@ elif model_option == "Monte Carlo":
 elif model_option == "Binomial":
     st.title("🌳 Binomial Model")
     
-    # Create Binomial model instances for both Call and Put
     binomial_call = BinomialOptionPricing(
         stock_price=stock_price,
         strike_price=strike_price,
@@ -452,7 +428,7 @@ elif model_option == "Binomial":
         option_type="put"
     )
     
-    # Calculate both option prices
+    # calculate both prices
     call_price = binomial_call.calculate_option()
     put_price = binomial_put.calculate_option()
     

@@ -1,6 +1,5 @@
 import streamlit as st
 
-# Page configuration
 st.set_page_config(
     page_title="Options Pricing Visualizer",
     page_icon="💰",
@@ -10,17 +9,16 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-/* Hide Streamlit's default menu and footer */
+/* hide menu and footer */
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 
-/* Ensure body covers full height */
 html, body {
     height: 100%;
     margin: 0;
 }
 
-/* Animated Gradient Overlay Background */
+/* background overlay */
 body {
     background: linear-gradient(-45deg, #1e3c72, #2a5298);
     background-size: 400% 400%;
@@ -28,13 +26,12 @@ body {
     cursor: url('https://cdn-icons-png.flaticon.com/512/25/25231.png'), crosshair; 
 }
 
-/* Container styling */
 div.block-container {
     padding-top: 2rem;
     padding-bottom: 2rem;
 }
 
-/* Geometric Moving Pattern Background */
+/* background motion */
 .geometric-pattern {
     position: fixed;
     top: 0;
@@ -55,7 +52,6 @@ div.block-container {
     100% { background-position: 50px 50px, 50px 75px, 75px 25px, 25px 50px; }
 }
 
-/* Title container */
 .title-button-container {
     position: absolute;
     top: 80%;
@@ -70,7 +66,6 @@ div.block-container {
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
-/* Title Line 1 */
 .typing-line1 {
     font-size: 2.5rem;
     color: white; 
@@ -89,7 +84,6 @@ div.block-container {
         0 0 15px #000000; 
 }
 
-/* Title Line 2 */
 .typing-line2 {
     font-size: 2rem;
     color: white; 
@@ -110,7 +104,6 @@ div.block-container {
         0 0 15px #000000; 
 }
 
-/* Button styling */
 .stButton {
     display: flex;
     justify-content: center;
@@ -138,7 +131,6 @@ div.block-container {
     transform: scale(1.1);
 }
 
-/* Footer styling */
 .footer {
     position: fixed;
     bottom: 0;
@@ -183,19 +175,16 @@ div.block-container {
     text-decoration: underline;
 }
 
-/* Fade-In Animation for Title */
 @keyframes fadeIn {
     0% { opacity: 0; }
     100% { opacity: 1; }
 }
 
-/* Slide-In Animations for Titles */
 @keyframes slideIn {
     from { transform: translateY(-20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
 }
 
-/* Thick black line at the top */
 .custom-line-bottom {
     height: 50px;
     background-color: black;
@@ -206,8 +195,7 @@ div.block-container {
     z-index: 1000;
     pointer-events: none;
 }
-
-/* Thick black line at the bottom */
+            
 .custom-line-top {
     height: 150px;
     background-color: black;
@@ -219,7 +207,6 @@ div.block-container {
     pointer-events: none;
 }
 
-/* Responsiveness */
 @media (max-width: 768px) {
     .typing-line1 {
         font-size: 2rem;
@@ -234,8 +221,6 @@ div.block-container {
         padding: 10px 25px;
     }
 }
-
-/* Remove spacing around footer links */
 .footer-section a {
     display: inline; 
     margin: 0;
@@ -245,28 +230,21 @@ div.block-container {
 </style>
 """, unsafe_allow_html=True)
 
-# Add thick black line at the top
 st.markdown('<div class="custom-line-top"></div>', unsafe_allow_html=True)
 
-# Geometric pattern background
 st.markdown('<div class="geometric-pattern"></div>', unsafe_allow_html=True)
 
-# Title and Button Container
 st.markdown('<div class="title-button-container">', unsafe_allow_html=True)
 
-# Title lines
 st.markdown('<div class="typing-line1">Options Pricing Dashboard:</div>', unsafe_allow_html=True)
 st.markdown('<div class="typing-line2">A Visualizer for Black-Scholes, Monte Carlo & Binomial Models</div>', unsafe_allow_html=True)
 
-# Button with navigation
 if st.button("Run Visualizations"):
     st.session_state.example_params = True
     st.switch_page("pages/Main.py") 
 
-# Close title-button-container div
 st.markdown('</div>', unsafe_allow_html=True)
 
-# Footer
 st.markdown("""
 <div class="footer">
     <div class="footer-content">
@@ -287,6 +265,5 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Add thick black line at the bottom
 st.markdown('<div class="custom-line-bottom"></div>', unsafe_allow_html=True)
 

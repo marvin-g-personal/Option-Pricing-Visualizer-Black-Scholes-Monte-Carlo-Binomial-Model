@@ -42,11 +42,9 @@ class BinomialOptionPricing:
         asset_p = np.zeros(self.steps + 1)
         option_p = np.zeros(self.steps + 1)
 
-        # Calculate asset prices at maturity
         for i in range(self.steps + 1):
             asset_p[i] = self.stock_price * (self.up ** (self.steps - i)) * (self.down ** i)
 
-        # Calculate option values at maturity
         for i in range(self.steps + 1):
             if self.option_type.lower() == "call":
                 option_p[i] = max(0, asset_p[i] - self.strike)
@@ -54,8 +52,7 @@ class BinomialOptionPricing:
                 option_p[i] = max(0, self.strike - asset_p[i])
             else:
                 raise ValueError("Option type must be 'call' or 'put'.")
-
-        # Backward induction for option pricing
+            
         for i in range(self.steps - 1, -1, -1):
             for j in range(i + 1):
                 # Price at node
@@ -81,18 +78,15 @@ class BinomialOptionPricing:
         fig = plt.figure(figsize=(12, 8))
         ax = fig.add_subplot(111)
         
-        # Set dark background
         ax.set_facecolor('#1E1E1E')
         fig.patch.set_facecolor('#1E1E1E')
         
         asset_prices = np.zeros((self.steps + 1, self.steps + 1))
 
-        # Calculate asset prices for each node
         for i in range(self.steps + 1):
             for j in range(i + 1):
                 asset_prices[j, i] = self.stock_price * (self.up ** (i - j)) * (self.down ** j)
 
-        # Plot asset prices and connections
         for i in range(self.steps + 1):
             plt.plot([i] * (i + 1), asset_prices[:i + 1, i], "o", 
                      color='cornflowerblue', markersize=8)
@@ -109,15 +103,13 @@ class BinomialOptionPricing:
                   fontsize=14, pad=20, color='white')
         plt.xlabel("Steps", fontsize=12, color='white')
         plt.ylabel("Price ($)", fontsize=12, color='white')
-        plt.grid(True, alpha=0.2)  # Reduced grid opacity for dark theme
+        plt.grid(True, alpha=0.2)
         
-        # Make tick labels white
         plt.tick_params(colors='white')
         
         plt.tight_layout()
         return fig
 
-# Example Usage
 if __name__ == "__main__":
     stock_price = 80
     strike_price = 100
