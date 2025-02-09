@@ -255,9 +255,9 @@ with st.sidebar:
     
     if model_option == "Black-Scholes":
         current_price = st.number_input("Current Asset Price", value=100.0)
-        strike = st.number_input("Strike Price", value=100.0)
-        time_to_maturity = st.number_input("Time to Maturity (Years)", value=1.0)
-        volatility = st.number_input("Volatility (σ)", value=0.2)
+        strike = st.number_input("Strike-Price", value=100.0)
+        time_to_maturity = st.number_input("Time to Maturity | Years", value=1.0)
+        volatility = st.number_input("σ | Volatility)", value=0.2)
         interest_rate = st.number_input("Risk-Free Interest Rate", value=0.05)
         
         purchase_price_call = st.number_input("Call Option Purchase Price", value=10.0)
@@ -265,27 +265,27 @@ with st.sidebar:
 
         st.markdown("---")
         
-        spot_min = st.number_input('Min Spot Price', min_value=0.01, value=current_price*0.8, step=0.01)
-        spot_max = st.number_input('Max Spot Price', min_value=0.01, value=current_price*1.2, step=0.01)
-        vol_min = st.slider('Min Volatility for Heatmap', min_value=0.01, max_value=1.0, value=volatility*0.5, step=0.01)
-        vol_max = st.slider('Max Volatility for Heatmap', min_value=0.01, max_value=1.0, value=volatility*1.5, step=0.01)
+        spot_min = st.number_input('Minimum Spot Price', min_value=0.01, value=current_price*0.8, step=0.01)
+        spot_max = st.number_input('Maximum Spot Price', min_value=0.01, value=current_price*1.2, step=0.01)
+        vol_min = st.slider('Minimum Volatility', min_value=0.01, max_value=1.0, value=volatility*0.5, step=0.01)
+        vol_max = st.slider('Maximum Volatility', min_value=0.01, max_value=1.0, value=volatility*1.5, step=0.01)
         
         spot_range = np.linspace(spot_min, spot_max, 10)
         vol_range = np.linspace(vol_min, vol_max, 10)
     elif model_option == "Monte Carlo":
-        current_price = st.number_input("Initial Stock Price ($)", value=100.0)
-        strike = st.number_input("Strike Price ($)", value=100.0)
+        current_price = st.number_input("Initial Stock Price | $", value=100.0)
+        strike = st.number_input("Strike-Price | $", value=100.0)
         interest_rate = st.number_input("Risk-Free Rate", value=0.03)
-        volatility = st.number_input("Volatility (σ)", value=0.25)
-        time_to_maturity = st.number_input("Time to Maturity (Years)", value=0.5)
+        volatility = st.number_input("σ | Volatility", value=0.25)
+        time_to_maturity = st.number_input("Time to Maturity | Years", value=0.5)
         steps = st.number_input("Number of Time Steps", value=100)
         num_sims = st.number_input("Number of Simulations", value=1000)
     elif model_option == "Binomial":
-        stock_price = st.number_input("Stock Price ($)", value=80.0)
-        strike_price = st.number_input("Strike Price ($)", value=100.0)
-        expiration_time = st.number_input("Expiration Time (Years)", value=2.0)
+        stock_price = st.number_input("Stock Price | $", value=80.0)
+        strike_price = st.number_input("Strike-Price | $", value=100.0)
+        expiration_time = st.number_input("Expiration Time | Years", value=2.0)
         no_risk_int = st.number_input("Risk-Free Rate", value=0.05)
-        sigma = st.number_input("Volatility (σ)", value=0.3)
+        sigma = st.number_input("σ | Volatility", value=0.3)
         steps = st.number_input("Number of Steps", value=10)
     else:
         st.markdown("---")

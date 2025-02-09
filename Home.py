@@ -248,8 +248,11 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown("""
 <div class="footer">
     <div class="footer-content">
-        <div class="footer-section left">© marvin-g-personal</div>
-        <div class="footer-section">
+        <div class="footer-section left" style="flex: 0 0 auto;">
+            <a href="https://www.instagram.com/dataclubnu/" target="_blank">DATA @ NEU</a> | 
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=gandhi.mar@northeastern.edu&su=Contact%20Request&body=Hello%2C%0A%0AI%20would%20like%20to%20get%20in%20touch%20with%20you." target="_blank">Contact</a>
+        </div>
+        <div class="footer-section" style="flex: 1; text-align: center; position: absolute; left: 50%; transform: translateX(-50%);">
             Created By:
             <a href="https://www.linkedin.com/in/marvin-gandhi/" target="_blank">Marvin Gandhi</a>,
             <a href="https://www.linkedin.com/in/bennett-franciosi-5b8454324/" target="_blank">Bennett Franciosi</a>,
@@ -257,13 +260,11 @@ st.markdown("""
             <a href="https://www.linkedin.com/in/vaibhav-singh-548b861b0/" target="_blank">Vaibhav Singh</a>,
             <a href="https://www.linkedin.com/in/tafari-darosa-levy-337b65262/" target="_blank">Tafari Darosa-Levy</a>
         </div>
-        <div class="footer-section right">
-            <a href="https://www.instagram.com/dataclubnu/" target="_blank">DATA @ NEU</a>
-            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=gandhi.mar@northeastern.edu&su=Contact%20Request&body=Hello%2C%0A%0AI%20would%20like%20to%20get%20in%20touch%20with%20you." target="_blank" style="margin-left: 10px;">Contact</a>
-        </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
+
+
 
 st.markdown('<div class="custom-line-bottom"></div>', unsafe_allow_html=True)
 
